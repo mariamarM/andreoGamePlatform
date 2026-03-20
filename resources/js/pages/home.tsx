@@ -18,10 +18,10 @@ export default function Dashboard() {
 
             {/* 🔝 Header */}
             <div className="flex justify-between items-center p-6 text-white">
-                <h1 className="text-3xl font-bold">🎮 Game Dashboard</h1>
+                <h1 className="text-3xl text-black font-bold"> Game Dashboard</h1>
 
                 {!user ? (
-                    <div className="flex gap-3">
+                    <div className="flex gap-3 text-black">
                         <a href="/login" className="glass-btn">Login</a>
                         <a href="/register" className="glass-btn">Register</a>
                     </div>
