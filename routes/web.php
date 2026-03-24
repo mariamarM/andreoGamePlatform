@@ -6,9 +6,10 @@ use Laravel\Fortify\Features;
 Route::inertia('/', 'home', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
-    Route::inertia('/admin', 'AdminDashboard');
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware([ 'role:admin'])->group(function () {
+        Route::inertia('/admin', 'AdminDashboard');
+
     //poner la ruta de cada pagina sin pasarse
 });
 
