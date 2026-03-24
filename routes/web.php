@@ -6,13 +6,14 @@ use Laravel\Fortify\Features;
 Route::inertia('/', 'home', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
-
-Route::middleware(['austh', 'role:admin'])->group(function () {
     Route::inertia('/admin', 'AdminDashboard');
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    //poner la ruta de cada pagina sin pasarse
 });
 
 Route::middleware(['auth', 'role:gestor'])->group(function () {
-    Route::inertia('/gestor', 'Index'); // tu index.tsx
+    Route::inertia('/gestor', 'Index');
 });
 // Route::post('/test-facial', function (Request $request) {
 //     // 2000 es lo de los megas (yo lo tengo a 40 pero para seguir la practica)
@@ -55,9 +56,7 @@ Route::middleware(['auth', 'role:gestor'])->group(function () {
 //     }
 // });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::inertia('/admin', 'AdminDashboard');
-});
+
 Route::get('/games', function () {
     $games = \App\Models\Game::where('is_published', true)->get();
     return Inertia::render('Games', [
