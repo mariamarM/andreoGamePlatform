@@ -12,16 +12,17 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
-
+use App\Http\Responses\LoginResponse;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 class FortifyServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
-    public function register(): void
-    {
-        //
-    }
+   public function register(): void
+{
+    $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
+}
 
     /**
      * Bootstrap any application services.
@@ -31,6 +32,28 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+
+        Fortify::authenticateUsing(function ($request) {
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if ($user && \Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+            return $user;
+        }
+    });
+
+    // Fortify::loginResponse(function () {
+    //     $user = auth()->user();
+
+    //     if ($user->role_id == 1) {
+    //         return redirect('/admin');
+    //     }
+
+    //     if ($user->role_id == 2) {
+    //         return redirect('/gestor');
+    //     }
+
+    //     return redirect('/');
+    // });
     }
 
     /**

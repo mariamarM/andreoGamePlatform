@@ -7,9 +7,13 @@ Route::inertia('/', 'home', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
 
-// Route::middleware(['auth', 'verified'])->group(function () {
-//     Route::inertia('dashboard', 'dashboard')->name('dashboard');
-// });
+Route::middleware(['austh', 'role:admin'])->group(function () {
+    Route::inertia('/admin', 'AdminDashboard');
+});
+
+Route::middleware(['auth', 'role:gestor'])->group(function () {
+    Route::inertia('/gestor', 'Index'); // tu index.tsx
+});
 // Route::post('/test-facial', function (Request $request) {
 //     // 2000 es lo de los megas (yo lo tengo a 40 pero para seguir la practica)
 //     $validator = Validator::make($request->all(), [
