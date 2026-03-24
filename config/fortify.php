@@ -153,5 +153,7 @@ return [
             // 'window' => 0
         ]),
     ],
-
+'responses' => [
+    'login' => App\Http\Responses\LoginResponse::class, // Si usas la Opción 2
+],
 ];

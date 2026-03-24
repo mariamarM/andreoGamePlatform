@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Providers;
-
+use App\Http\Responses\LoginResponses;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
-use App\Http\Responses\LoginResponse;
+
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -21,7 +21,8 @@ class FortifyServiceProvider extends ServiceProvider
      */
    public function register(): void
 {
-    $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
+     $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
+
 }
 
     /**

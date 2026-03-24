@@ -1,30 +1,22 @@
 <?php
 
-namespace App\Http\Responses;
+namespace App\Providers;
 
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Illuminate\Http\JsonResponse;
 
 class LoginResponse implements LoginResponseContract
 {
-    /**
-     * Handle the login response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response|JsonResponse
-     */
     public function toResponse($request)
     {
-        // Si la petición es AJAX, devolver JSON
-        if ($request->wantsJson()) {
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Login successful',
-                'user' => $request->user(),
-            ]);
+        $user = $request->user();
+
+        if ($user->role_id == 1) {
+            return redirect()->intended('/admin/dashboard');
+        } elseif ($user->role_id == 2) {
+            return redirect()->intended('/gestor/index');
         }
 
-        // Redirigir a ruta por defecto
-        return redirect()->intended('/admin/dashboard');
+        return redirect()->intended('/home');
     }
 }
