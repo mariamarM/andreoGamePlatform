@@ -139,5 +139,11 @@
 
     body {
         @apply bg-background text-foreground;
+        background-image: url('/bg/clouds.gif');
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
     }
 }

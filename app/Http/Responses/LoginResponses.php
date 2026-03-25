@@ -17,6 +17,6 @@ class LoginResponses implements LoginResponseContract
             return redirect()->intended('/gestor');
         }
 
-        return redirect()->intended('/home');
+        return redirect()->intended('/');
     }
 }

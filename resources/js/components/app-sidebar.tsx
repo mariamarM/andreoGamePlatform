@@ -39,7 +39,7 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     return (
-        <Sidebar collapsible="icon" variant="inset">
+        <Sidebar collapsible="icon" variant="inset" className="border-r border-white/20 bg-white/40 backdrop-blur-xl">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

@@ -10,7 +10,7 @@ export default function AppHeaderLayout({
     return (
         <AppShell variant="header">
             <AppHeader breadcrumbs={breadcrumbs} />
-            <AppContent variant="header">{children}</AppContent>
+            <AppContent variant="header" className="rounded-2xl border border-white/20 bg-white/60 shadow-2xl backdrop-blur-lg m-4 p-6">{children}</AppContent>
         </AppShell>
     );
 }
