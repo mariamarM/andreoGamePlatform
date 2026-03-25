@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Providers;
+namespace App\Http\Responses;
 
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Illuminate\Http\JsonResponse;
 
-class LoginResponse implements LoginResponseContract
+class LoginResponses implements LoginResponseContract
 {
     public function toResponse($request)
     {
         $user = $request->user();
 
         if ($user->role_id == 1) {
-            return redirect()->intended('/admin/dashboard');
+            return redirect()->intended('/admin');
         } elseif ($user->role_id == 2) {
-            return redirect()->intended('/gestor/index');
+            return redirect()->intended('/gestor');
         }
 
         return redirect()->intended('/home');

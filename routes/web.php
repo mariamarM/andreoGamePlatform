@@ -3,18 +3,25 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
-Route::inertia('/', 'home', [
+Route::inertia('/', 'Home', [
     'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+])->name('Home');
 
-Route::middleware([ 'role:admin'])->group(function () {
-        Route::inertia('/admin', 'AdminDashboard');
 
-    //poner la ruta de cada pagina sin pasarse
+Route::middleware(['auth', 'role:admin'])->group(function () {
+
+    Route::get('/admin', function () {
+        return Inertia::render('admin/AdminDashboard', [
+            'user' => auth()->user(), // <-- pasamos el usuario real
+        ]);
+    });
+
+    // Aquí puedes agregar otras rutas de admin si quieres
+    // Route::get('/admin/settings', function() { ... });
 });
 
 Route::middleware(['auth', 'role:gestor'])->group(function () {
-    Route::inertia('/gestor', 'Index');
+   Route::inertia('/gestor', 'gestor/Index');
 });
 // Route::post('/test-facial', function (Request $request) {
 //     // 2000 es lo de los megas (yo lo tengo a 40 pero para seguir la practica)
