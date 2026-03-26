@@ -169,7 +169,7 @@ const styles: Record<string, React.CSSProperties> = {
         height: '100px',
         borderRadius: '50%',
         pointerEvents: 'none',
-        backgroundImage: 'url(/bg/clouds.gif)',
+        backgroundImage: 'url(/bg/clouds.jpg)',
 backgroundSize: '130wh 100vh',
         backgroundRepeat: 'no-repeat',
 
