@@ -5,6 +5,35 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Laravel\Facades\Inertia;
 use Laravel\Fortify\Features;
 
+// 1. Ruta GET: Sirve para MOSTRAR la página con el formulario y la cámara
+Route::get('/test-facial', function () {
+    return view('test-facial'); // Asegúrate de que tu archivo se llama test-facial.blade.php
+});
+
+// 2. Ruta POST: Sirve para PROCESAR las fotos cuando el usuario le da a "Enviar"
+Route::post('/test-facial', function (Request $request) {
+    // 1. Verificación básica
+    if (!$request->hasFile('foto_registro') || !$request->hasFile('foto_webcam')) {
+        return back()->withErrors(['Faltan imágenes o superan el límite de PHP.']);
+    }
+
+    $url = env('FACIAL_SERVICE_URL', 'http://10.72.103.250:8181/verify');
+
+    try {
+        // 2. Comunicación con el microservicio Docker
+        $response = Http::timeout(60)
+            ->attach('img1', file_get_contents($request->file('foto_registro')), 'reg.jpg')
+            ->attach('img2', file_get_contents($request->file('foto_webcam')), 'web.jpg')
+            ->post($url);
+
+        // 3. Devolución de resultados a la vista
+        $resultadoPython = $response->json();
+        return view('test-facial', ['resultado' => $resultadoPython]);
+    } catch (\Exception $e) {
+        return back()->withErrors(['Error de conexión con Docker: ' . $e->getMessage()]);
+    }
+});
+
 Route::inertia('/', 'Home', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('Home');
@@ -12,7 +41,7 @@ Route::inertia('/', 'Home', [
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
-    Route::get('/admin', fn () => Inertia::render('admin/AdminDashboard', [
+    Route::get('/admin', fn() => Inertia::render('admin/AdminDashboard', [
         'user' => auth()->user(),
     ]))->name('admin');
 
@@ -24,13 +53,14 @@ Route::post('/logout', function () {
 })->name('logout');
 
 Route::middleware(['auth', 'role:gestor'])->group(function () {
-   Route::inertia('/gestor', 'gestor/Index');
+    Route::inertia('/gestor', 'gestor/Index');
 });
+
 // Route::post('/test-facial', function (Request $request) {
 //     // 2000 es lo de los megas (yo lo tengo a 40 pero para seguir la practica)
 //     $validator = Validator::make($request->all(), [
 //         'foto_registro' => 'required|image|max:20000',
-//         'foto_webcam'   => 'required|image|max:20000',
+//         'foto_webcam' => 'required|image|max:20000',
 //     ]);
 
 //     if ($validator->fails()) {
@@ -68,8 +98,8 @@ Route::middleware(['auth', 'role:gestor'])->group(function () {
 // });
 
 
-Route::get('/games', fn () => Inertia::render('Games', [
+Route::get('/games', fn() => Inertia::render('Games', [
     'games' => \App\Models\Game::where('is_published', true)->get()
 ]))->name('games');
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
