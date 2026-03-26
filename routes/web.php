@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Laravel\Facades\Inertia;
 use Laravel\Fortify\Features;
 
 Route::inertia('/', 'Home', [
@@ -10,15 +12,16 @@ Route::inertia('/', 'Home', [
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
-    Route::get('/admin', function () {
-        return Inertia::render('admin/AdminDashboard', [
-            'user' => auth()->user(), // <-- pasamos el usuario real
-        ]);
-    });
+    Route::get('/admin', fn () => Inertia::render('admin/AdminDashboard', [
+        'user' => auth()->user(),
+    ]))->name('admin');
 
-    // Aquí puedes agregar otras rutas de admin si quieres
-    // Route::get('/admin/settings', function() { ... });
+
 });
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/');
+})->name('logout');
 
 Route::middleware(['auth', 'role:gestor'])->group(function () {
    Route::inertia('/gestor', 'gestor/Index');
@@ -65,11 +68,8 @@ Route::middleware(['auth', 'role:gestor'])->group(function () {
 // });
 
 
-Route::get('/games', function () {
-    $games = \App\Models\Game::where('is_published', true)->get();
-    return Inertia::render('Games', [
-        'games' => $games
-    ]);
-})->name('games');
+Route::get('/games', fn () => Inertia::render('Games', [
+    'games' => \App\Models\Game::where('is_published', true)->get()
+]))->name('games');
 
 require __DIR__.'/settings.php';

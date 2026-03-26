@@ -1,187 +1,335 @@
-import { Link } from '@inertiajs/react';
-import React from 'react';
+import { router, Link } from '@inertiajs/react';
+import React, { useEffect, useState } from 'react';
 
 interface HomeProps {
-  user?: {
-    id: number;
-    name: string;
-    email: string;
-    role_id: number;
-  } | null;
+    user?: {
+        id: number;
+        name: string;
+        email: string;
+        role_id: number;
+    } | null;
 }
 
 export default function Home({ user }: HomeProps) {
-  return (
-    <div style={styles.container}>
-      {/* Header con botones de Login y Register */}
-      <header style={styles.header}>
-        <div style={styles.logo}>
-          <h1 style={styles.logoText}>GamePlatform</h1>
-        </div>
-        <div style={styles.headerButtons}>
-          <Link href="/login" style={styles.loginButton}>
-            Login
-          </Link>
-          <Link href="/register" style={styles.registerButton}>
-            Register
-          </Link>
-        </div>
-      </header>
+    const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
-      {/* Contenido principal con glass effect */}
-      <main style={styles.glassContainer}>
-        <div style={styles.glassContent}>
-          <h2 style={styles.title}>
-            {user ? `Bienvenido, ${user.name}!` : 'Bienvenido a GamePlatform'}
-          </h2>
-          <p style={styles.subtitle}>
-            {user
-              ? 'Explora todas las funcionalidades según tu rol.'
-              : 'La mejor plataforma para gestionar y jugar juegos.'}
-          </p>
+    useEffect(() => {
+        const handleMove = (e: globalThis.MouseEvent) => {
+            setMouse({ x: e.clientX, y: e.clientY });
+        };
 
-          {/* Widgets según rol */}
-          {user && (
-            <div style={styles.widgetsGrid}>
-              {user.role_id === 1 && (
-                <>
-                  <div style={styles.card}>Panel de Admin</div>
-                  <div style={styles.card}>Gestionar Usuarios</div>
-                  <div style={styles.card}>Reportes</div>
-                </>
-              )}
-              {user.role_id === 2 && (
-                <>
-                  <div style={styles.card}>Gestionar Juegos</div>
-                  <div style={styles.card}>Estadísticas</div>
-                  <div style={styles.card}>Reportes</div>
-                </>
-              )}
-              {user.role_id === 3 && (
-                <>
-                  <div style={styles.card}>Mis Juegos</div>
-                  <div style={styles.card}>Logros</div>
-                  <div style={styles.card}>Ranking</div>
-                </>
-              )}
-            </div>
-          )}
+        window.addEventListener('mousemove', handleMove);
+
+        return () => window.removeEventListener('mousemove', handleMove);
+    }, []);
+
+    return (
+        <div style={styles.container}>
+            <div style={styles.pixelOverlay} />
+            <video autoPlay loop muted playsInline style={styles.videoBg}>
+                <source src="/bg/clouds.mp4" type="video/mp4" />
+            </video>
+
+            <div
+                style={{
+                    ...styles.lens,
+                    left: mouse.x,
+                    top: mouse.y,
+                    backgroundPosition: `${-mouse.x + 75}px ${-mouse.y + 75}px`,
+                }}
+            />
+
+            <main style={styles.glassContainer}>
+                <div style={styles.glassContent}>
+                    <div style={styles.innerBlur} />
+
+                    <div style={styles.header}>
+                        <div style={styles.leftLinks}>
+                            <Link href="/login">Login</Link>
+                            <Link href="/register">Register</Link>
+                            {user && (
+    <button
+        style={styles.logoutButton}
+        onClick={() => router.post('/logout')}
+    >
+        Logout
+    </button>
+)}
+                        </div>
+                        <h1 style={styles.titleCenter}>Game Center Web</h1>
+                    </div>
+                    <div style={styles.content}>
+                        <h2>
+                            {user
+                                ? `Bienvenido, ${user.name}!`
+                                : 'Bienvenido a GamePlatform'}
+                        </h2>
+
+                        <p>
+                            {user
+                                ? 'Explora todas las funcionalidades según tu rol.'
+                                : 'La mejor plataforma para gestionar y jugar juegos.'}
+                        </p>
+                        <div style={styles.widgetsGrid}>
+                            <div style={styles.card}>
+
+                                <div style={styles.cardTitle}>Game 1</div>
+                             <iframe style={styles.iframe} src="https://itch.io/embed/4340743"><a href="https://noelcody.itch.io/moss-moss">Moss Moss by Noel Cody</a></iframe>
+                                <div style={styles.cardArrow}>↗</div>
+                            </div>
+                            <div style={styles.card}>Game 2</div>
+                            <div style={styles.card}>Game 3</div>
+                        </div>
+                        {user && (
+                            <div style={styles.widgetsGrid}>
+                                {user.role_id === 1 && (
+                                    <>
+                                        <div style={styles.card}>
+                                            Panel de Admin
+                                        </div>
+                                        <div style={styles.card}>
+                                            Gestionar Usuarios
+                                        </div>
+                                        <div style={styles.card}>Reportes</div>
+                                    </>
+                                )}
+
+                                {user.role_id === 2 && (
+                                    <>
+                                        <div style={styles.card}>
+                                            Gestionar Juegos
+                                        </div>
+                                        <div style={styles.card}>
+                                            Estadísticas
+                                        </div>
+                                        <div style={styles.card}>Reportes</div>
+                                    </>
+                                )}
+
+                                {user.role_id === 3 && (
+                                    <>
+                                        <div style={styles.card}>
+                                            Mis Juegos
+                                        </div>
+                                        <div style={styles.card}>Logros</div>
+                                        <div style={styles.card}>Ranking</div>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </main>
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer style={styles.footer}>
-        <p>© {new Date().getFullYear()} GamePlatform. Todos los derechos reservados.</p>
-      </footer>
-    </div>
-  );
+    );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: {
-    minHeight: '100vh',
-    width: '100%',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '1.5rem 3rem',
-    background: 'rgba(255, 255, 255, 0.7)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
-    boxShadow: '0 2px 20px rgba(0, 0, 0, 0.1)',
-  },
-  logo: {
-    flex: 1,
-  },
-  logoText: {
-    color: '#1e293b',
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    margin: 0,
-  },
-  headerButtons: {
-    display: 'flex',
-    gap: '1rem',
-  },
-  loginButton: {
-    padding: '0.6rem 1.5rem',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
-    border: '2px solid #1e293b',
-    borderRadius: '50px',
-    color: '#1e293b',
-    textDecoration: 'none',
-    fontWeight: 500,
-    transition: 'all 0.3s ease',
-  },
-  registerButton: {
-    padding: '0.6rem 1.5rem',
-    backgroundColor: '#1e293b',
+    container: {
+        height: '100vh',
+        width: '100%',
+        fontFamily: "'Rubik', sans-serif",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    videoBg: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        zIndex: -1,
+        filter: 'blur(6px) brightness(0.3)',
+          transform: 'scale(1.2)',
+  imageRendering: 'pixelated',
+    },
+    pixelOverlay: {
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+
+  pointerEvents: 'none',
+
+  backgroundImage: `
+    linear-gradient(rgba(0,0,0,0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.15) 1px, transparent 1px)
+  `,
+  backgroundSize: '25px 25px',
+
+  zIndex: -1,
+},
+    lens: {
+        position: 'fixed',
+        width: '100px',
+        height: '100px',
+        borderRadius: '50%',
+        pointerEvents: 'none',
+        backgroundImage: 'url(/bg/clouds.gif)',
+backgroundSize: '130wh 100vh',
+        backgroundRepeat: 'no-repeat',
+
+        transform: 'translate(-50%, -50%)',
+        zIndex: 2,
+    },
+    content: {
+        textAlign: 'center',
+    },
+    leftLinks: {
+        display: 'flex',
+        gap: '1rem',
+    },
+
+    titleCenter: {
+        position: 'absolute',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        fontSize: '35px',
+        fontWeight: 600,
+        margin: 0,
+        color: '#1e293b',
+    },
+    iframe: {
+        width: '100%',
+        height: '100%',
+        border: 'none',
+        borderRadius: '10px',
+    },
+    innerBlur: {
+        position: 'absolute',
+        inset: 0,
+        borderRadius: '30px',
+        pointerEvents: 'none',
+        background: `
+    radial-gradient(circle at top, rgba(255,255,255,0.4), transparent 60%),
+    radial-gradient(circle at bottom, rgba(255,255,255,0.3), transparent 60%)
+  `,
+    },
+    header: {
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: '2rem',
+    },
+    logo: {
+        flex: 1,
+    },
+    logoutButton: {
+    padding: '0.5rem 1rem',
     border: 'none',
-    borderRadius: '50px',
-    color: '#fff',
-    textDecoration: 'none',
-    fontWeight: 600,
-    transition: 'all 0.3s ease',
-  },
-  glassContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '2rem',
-    minHeight: 'calc(100vh - 160px)',
-  },
-  glassContent: {
-    background: 'rgba(255, 255, 255, 0.75)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    borderRadius: '30px',
-    border: '1px solid rgba(255, 255, 255, 0.5)',
-    padding: '3rem 4rem',
-    textAlign: 'center',
-    maxWidth: '800px',
-    width: '100%',
-    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.2)',
-  },
-  title: {
-    color: '#1e293b',
-    fontSize: '2.5rem',
-    fontWeight: 'bold',
-    marginBottom: '1rem',
-  },
-  subtitle: {
-    color: 'rgba(30, 41, 59, 0.8)',
-    fontSize: '1.2rem',
-    marginBottom: '2rem',
-  },
-  widgetsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '1rem',
-    marginTop: '2rem',
-  },
-  card: {
-    padding: '1.2rem',
-    background: 'rgba(255, 255, 255, 0.6)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
-    borderRadius: '16px',
-    border: '1px solid rgba(30, 41, 59, 0.1)',
-    color: '#1e293b',
-    fontWeight: 600,
-    fontSize: '1rem',
+    borderRadius: '8px',
+    color: '#ef4444',
     cursor: 'pointer',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-  },
-  footer: {
-    padding: '1rem',
-    textAlign: 'center',
-    background: 'rgba(255, 255, 255, 0.7)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
-    color: 'rgba(30, 41, 59, 0.6)',
-  },
+    fontWeight: 'bold',
+    transition: 'all 0.3s ease',
+},
+    logoText: {
+        color: '#1e293b',
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        margin: 0,
+    },
+    headerButtons: {
+        display: 'flex',
+        gap: '1rem',
+    },
+    loginButton: {
+        padding: '0.6rem 1.5rem',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        border: '2px solid #1e293b',
+        borderRadius: '50px',
+        color: '#1e293b',
+        textDecoration: 'none',
+        fontWeight: 500,
+        transition: 'all 0.3s ease',
+    },
+    registerButton: {
+        padding: '0.6rem 1.5rem',
+        backgroundColor: '#1e293b',
+        border: 'none',
+        borderRadius: '50px',
+        color: '#fff',
+        textDecoration: 'none',
+        fontWeight: 600,
+        transition: 'all 0.3s ease',
+    },
+    glassContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '60px 40px',
+        minHeight: 'calc(118vh - 160px)',
+    },
+
+    glassContent: {
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem',
+        background: 'rgba(255, 255, 255, 0.15)',
+        backdropFilter: 'blur(25px)',
+        WebkitBackdropFilter: 'blur(25px)',
+        borderRadius: '30px',
+        border: '1px solid rgba(255, 255, 255, 0.3)',
+        padding: '3rem 4rem',
+        textAlign: 'center',
+        maxWidth: '89%',
+        width: '100%',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+        overflow: 'hidden',
+        height: '95%',
+    },
+
+    title: {
+        color: '#1e293b',
+        fontSize: '2.5rem',
+        fontWeight: 'bold',
+        marginBottom: '1rem',
+    },
+    subtitle: {
+        color: 'rgba(30, 41, 59, 0.8)',
+        fontSize: '1.2rem',
+        marginBottom: '2rem',
+    },
+    widgetsGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '1rem',
+        marginTop: '2rem',
+    },
+    card: {
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        background: 'rgba(0,0,0,0.6)',
+        borderRadius: '16px',
+        padding: '10px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        color: '#fff',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+    },
+
+
+
+    cardTitle: {
+        fontSize: '14px',
+        fontWeight: 500,
+    },
+
+    cardArrow: {
+        position: 'absolute',
+        bottom: '10px',
+        right: '10px',
+        fontSize: '16px',
+        transform: 'rotate(0deg)',
+    },
 };
