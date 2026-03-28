@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Laravel\Facades\Inertia;
 use Laravel\Fortify\Features;
+use Illuminate\Http\Request;
 
 // 1. Ruta GET: Sirve para MOSTRAR la página con el formulario y la cámara
 Route::get('/test-facial', function () {
