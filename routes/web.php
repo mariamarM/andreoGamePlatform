@@ -13,24 +13,23 @@ Route::get('/test-facial', function () {
 
 // 2. Ruta POST: Sirve para PROCESAR las fotos cuando el usuario le da a "Enviar"
 Route::post('/test-facial', function (Request $request) {
-    // 1. Verificación básica
-    if (!$request->hasFile('foto_registro') || !$request->hasFile('foto_webcam')) {
-        return back()->withErrors(['Faltan imágenes o superan el límite de PHP.']);
-    }
+    logger('Foto registro tamaño:', [$request->file('foto_registro')->getSize()]);
+    logger('Foto webcam tamaño:', [$request->file('foto_webcam')->getSize()]);
 
-    $url = env('FACIAL_SERVICE_URL', 'http://10.72.103.250:8181/verify');
+    $url = env('FACIAL_SERVICE_URL');
 
     try {
-        // 2. Comunicación con el microservicio Docker
         $response = Http::timeout(60)
             ->attach('img1', file_get_contents($request->file('foto_registro')), 'reg.jpg')
             ->attach('img2', file_get_contents($request->file('foto_webcam')), 'web.jpg')
             ->post($url);
 
-        // 3. Devolución de resultados a la vista
+        logger('Respuesta microservicio:', [$response->body()]);
         $resultadoPython = $response->json();
+
         return view('test-facial', ['resultado' => $resultadoPython]);
     } catch (\Exception $e) {
+        logger('Error microservicio:', [$e->getMessage()]);
         return back()->withErrors(['Error de conexión con Docker: ' . $e->getMessage()]);
     }
 });

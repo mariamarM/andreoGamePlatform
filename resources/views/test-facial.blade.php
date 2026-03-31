@@ -184,51 +184,72 @@
         </form>
     </div>
 
-    <script>
-        const video = document.getElementById('videoElement');
-        const canvas = document.getElementById('canvasElement');
-        const btnCapturar = document.getElementById('btnCapturar');
-        const inputWebcam = document.getElementById('inputWebcam');
-        const btnEnviar = document.getElementById('btnEnviar');
-        let stream;
+  <script>
+const video = document.getElementById('videoElement');
+const canvas = document.getElementById('canvasElement');
+const btnCapturar = document.getElementById('btnCapturar');
+const inputWebcam = document.getElementById('inputWebcam');
+const btnEnviar = document.getElementById('btnEnviar');
+let stream;
 
-        async function iniciarCamara() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: true
-                });
-                video.srcObject = stream;
-            } catch (error) {
-                console.error("Error al acceder a la cámara:", error);
-                alert("No se pudo acceder a la cámara.");
-            }
+async function iniciarCamara() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+
+        video.addEventListener('loadedmetadata', () => {
+            console.log("Cámara iniciada:", stream);
+            console.log("Video dimensiones reales:", video.videoWidth, video.videoHeight);
+        });
+    } catch (error) {
+        console.error("Error al acceder a la cámara:", error);
+        alert("No se pudo acceder a la cámara.");
+    }
+}
+
+iniciarCamara();
+
+btnCapturar.addEventListener('click', () => {
+    console.log("Botón Capturar pulsado");
+
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+        alert("Cámara aún no lista.");
+        console.log("Video dimensiones aún 0:", video.videoWidth, video.videoHeight);
+        return;
+    }
+
+    const context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    console.log("Imagen dibujada en canvas:", canvas.width, canvas.height);
+
+    // Convertimos canvas a blob
+    canvas.toBlob((blob) => {
+        if (!blob) {
+            console.error("Blob no generado desde canvas");
+            return;
         }
 
-        iniciarCamara();
+        console.log("Blob generado desde canvas:", blob.size);
 
-        btnCapturar.addEventListener('click', () => {
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const file = new File([blob], "foto_capturada.jpg", { type: "image/jpeg" });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        inputWebcam.files = dataTransfer.files;
 
-            canvas.toBlob((blob) => {
-                const file = new File([blob], "foto_capturada.jpg", {
-                    type: "image/jpeg"
-                });
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                inputWebcam.files = dataTransfer.files;
+        console.log("Archivo añadido al input oculto:", inputWebcam.files);
 
-                btnCapturar.innerText = "✅ ¡Foto Capturada!";
-                btnCapturar.style.backgroundColor = "#059669";
-                btnEnviar.disabled = false;
+        btnCapturar.innerText = "✅ ¡Foto Capturada!";
+        btnCapturar.style.backgroundColor = "#059669";
+        btnEnviar.disabled = false;
 
-                // Apagamos la cámara para liberar recursos
-                stream.getTracks().forEach(track => track.stop());
-            }, 'image/jpeg');
-        });
-    </script>
+        // Pausar video para congelar la imagen
+        video.pause();
+        stream.getTracks().forEach(track => track.stop());
+    }, 'image/jpeg', 0.9);
+});
+</script>
 
 </body>
 
