@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Laravel\Facades\Inertia;
 use Laravel\Fortify\Features;
 use Illuminate\Http\Request;
-
+use App\Http\Controllers\MessageController;
 // 1. Ruta GET: Sirve para MOSTRAR la página con el formulario y la cámara
 Route::get('/test-facial', function () {
     return view('test-facial'); // Asegúrate de que tu archivo se llama test-facial.blade.php
@@ -44,8 +44,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         'user' => auth()->user(),
     ]))->name('admin');
 
-
+   Route::get('/chat', [App\Http\Controllers\MessageController::class, 'index'])->name('chat.index');
 });
+
 Route::post('/logout', function () {
     Auth::logout();
     return redirect('/');
@@ -54,47 +55,6 @@ Route::post('/logout', function () {
 Route::middleware(['auth', 'role:gestor'])->group(function () {
     Route::inertia('/gestor', 'gestor/Index');
 });
-
-// Route::post('/test-facial', function (Request $request) {
-//     // 2000 es lo de los megas (yo lo tengo a 40 pero para seguir la practica)
-//     $validator = Validator::make($request->all(), [
-//         'foto_registro' => 'required|image|max:20000',
-//         'foto_webcam' => 'required|image|max:20000',
-//     ]);
-
-//     if ($validator->fails()) {
-//         return back()->withErrors($validator)->withInput();
-//     }
-
-//     $url = env('FACIAL_SERVICE_URL');
-
-//     try {
-//         $response = Http::timeout(60)
-//             ->attach(
-//                 'img1',
-//                 file_get_contents($request->file('foto_registro')->getRealPath()),
-//                 $request->file('foto_registro')->getClientOriginalName()
-//             )
-//             ->attach(
-//                 'img2',
-//                 file_get_contents($request->file('foto_webcam')->getRealPath()),
-//                 $request->file('foto_webcam')->getClientOriginalName()
-//             )
-//             ->post($url);
-
-//         // esto hace q si o si te devuelva el json con  el true
-//         // or false del match de las otos
-//         if ($response->successful()) {
-//             $datos = $response->json();
-//             return view('testfacial', ['resultado' => $datos]);
-//         } else {
-//             return back()->withErrors(['Error: El microservicio facial respondió con código ' . $response->status()]);
-//         }
-
-//     } catch (\Exception $e) {
-//         return back()->withErrors(['Error: ' . $e->getMessage()]);
-//     }
-// });
 
 
 Route::get('/games', fn() => Inertia::render('Games', [
