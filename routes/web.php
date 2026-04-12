@@ -13,24 +13,23 @@ Route::get('/test-facial', function () {
 
 // 2. Ruta POST: Sirve para PROCESAR las fotos cuando el usuario le da a "Enviar"
 Route::post('/test-facial', function (Request $request) {
-    logger('Foto registro tamaño:', [$request->file('foto_registro')->getSize()]);
-    logger('Foto webcam tamaño:', [$request->file('foto_webcam')->getSize()]);
-
-    $url = env('FACIAL_SERVICE_URL');
-
     try {
         $response = Http::timeout(60)
             ->attach('img1', file_get_contents($request->file('foto_registro')), 'reg.jpg')
             ->attach('img2', file_get_contents($request->file('foto_webcam')), 'web.jpg')
-            ->post($url);
+            ->post(env('FACIAL_SERVICE_URL'));
 
-        logger('Respuesta microservicio:', [$response->body()]);
         $resultadoPython = $response->json();
 
-        return view('test-facial', ['resultado' => $resultadoPython]);
+        return response()->json([
+            'success' => true,
+            'resultado' => $resultadoPython
+        ]);
     } catch (\Exception $e) {
-        logger('Error microservicio:', [$e->getMessage()]);
-        return back()->withErrors(['Error de conexión con Docker: ' . $e->getMessage()]);
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
     }
 });
 

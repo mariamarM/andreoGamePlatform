@@ -22,7 +22,8 @@
             background: white;
             padding: 2rem;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
             width: 100%;
             max-width: 450px;
         }
@@ -136,6 +137,11 @@
             border-radius: 6px;
             overflow-x: auto;
         }
+
+        #mensajeResultado {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -161,7 +167,8 @@
         </div>
         @endif
 
-        <form action="/test-facial" method="POST" enctype="multipart/form-data">
+        <!-- FORMULARIO ÚNICO -->
+        <form id="formFacial" action="/test-facial" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="form-group">
@@ -179,78 +186,89 @@
             </div>
 
             <input type="file" name="foto_webcam" id="inputWebcam" style="display: none;" required>
-
             <button type="submit" class="btn-submit" id="btnEnviar" disabled>🚀 Enviar al Microservicio</button>
         </form>
+
+        <!-- Contenedor de mensajes dinámicos -->
+        <div id="mensajeResultado"></div>
     </div>
 
-  <script>
-const video = document.getElementById('videoElement');
-const canvas = document.getElementById('canvasElement');
-const btnCapturar = document.getElementById('btnCapturar');
-const inputWebcam = document.getElementById('inputWebcam');
-const btnEnviar = document.getElementById('btnEnviar');
-let stream;
+    <script>
+        const video = document.getElementById('videoElement');
+        const canvas = document.getElementById('canvasElement');
+        const btnCapturar = document.getElementById('btnCapturar');
+        const inputWebcam = document.getElementById('inputWebcam');
+        const btnEnviar = document.getElementById('btnEnviar');
+        const form = document.getElementById('formFacial');
+        const mensajeResultado = document.getElementById('mensajeResultado');
+        let stream;
 
-async function iniciarCamara() {
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-
-        video.addEventListener('loadedmetadata', () => {
-            console.log("Cámara iniciada:", stream);
-            console.log("Video dimensiones reales:", video.videoWidth, video.videoHeight);
-        });
-    } catch (error) {
-        console.error("Error al acceder a la cámara:", error);
-        alert("No se pudo acceder a la cámara.");
-    }
-}
-
-iniciarCamara();
-
-btnCapturar.addEventListener('click', () => {
-    console.log("Botón Capturar pulsado");
-
-    if (video.videoWidth === 0 || video.videoHeight === 0) {
-        alert("Cámara aún no lista.");
-        console.log("Video dimensiones aún 0:", video.videoWidth, video.videoHeight);
-        return;
-    }
-
-    const context = canvas.getContext('2d');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    console.log("Imagen dibujada en canvas:", canvas.width, canvas.height);
-
-    // Convertimos canvas a blob
-    canvas.toBlob((blob) => {
-        if (!blob) {
-            console.error("Blob no generado desde canvas");
-            return;
+        async function iniciarCamara() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (error) {
+                console.error("Error al acceder a la cámara:", error);
+                alert("No se pudo acceder a la cámara.");
+            }
         }
+        iniciarCamara();
 
-        console.log("Blob generado desde canvas:", blob.size);
+        btnCapturar.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        const file = new File([blob], "foto_capturada.jpg", { type: "image/jpeg" });
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        inputWebcam.files = dataTransfer.files;
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+                const file = new File([blob], "foto_capturada.jpg", { type: "image/jpeg" });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                inputWebcam.files = dataTransfer.files;
 
-        console.log("Archivo añadido al input oculto:", inputWebcam.files);
+                btnCapturar.innerText = "✅ ¡Foto Capturada!";
+                btnCapturar.style.backgroundColor = "#059669";
+                btnEnviar.disabled = false;
 
-        btnCapturar.innerText = "✅ ¡Foto Capturada!";
-        btnCapturar.style.backgroundColor = "#059669";
-        btnEnviar.disabled = false;
+                video.pause();
+                stream.getTracks().forEach(track => track.stop());
+            }, 'image/jpeg', 0.9);
+        });
 
-        // Pausar video para congelar la imagen
-        video.pause();
-        stream.getTracks().forEach(track => track.stop());
-    }, 'image/jpeg', 0.9);
+        // Enviar formulario con fetch y mostrar resultado sin recargar
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            mensajeResultado.innerHTML = "⏳ Enviando imágenes...";
+
+            const formData = new FormData(form);
+
+            try {
+     const response = await fetch('test-facial', {
+    method: 'POST',
+    body: formData
+
 });
-</script>
 
+                if (!response.ok) throw new Error('Error al enviar las imágenes');
+
+                const data = await response.json();
+
+                if (data.match === true) {
+                    mensajeResultado.innerHTML = "✅ Las imágenes coinciden. ¡Son la misma persona!";
+                    mensajeResultado.style.color = "#065f46";
+                } else {
+                    mensajeResultado.innerHTML = "❌ Las imágenes no coinciden. No son la misma persona.";
+                    mensajeResultado.style.color = "#991b1b";
+                }
+
+            } catch (error) {
+                console.error(error);
+                    mensajeResultado.innerHTML = "❌ Error al enviar las imágenes.";
+                mensajeResultado.style.color = "#991b1b";
+            }
+        });
+    </script>
 </body>
 
 </html>
