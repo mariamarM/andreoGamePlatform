@@ -7,7 +7,7 @@ interface HomeProps {
         name: string;
         email: string;
         role_id: number;
-    } | null;
+    } ;
 }
 
 export default function Home({ user }: HomeProps) {
@@ -47,14 +47,15 @@ export default function Home({ user }: HomeProps) {
                         <div style={styles.leftLinks}>
                             <Link href="/login">Login</Link>
                             <Link href="/register">Register</Link>
+                            <Link href="/chat">Chat</Link>
                             {user && (
-    <button
-        style={styles.logoutButton}
-        onClick={() => router.post('/logout')}
-    >
-        Logout
-    </button>
-)}
+                                <button
+                                    style={styles.logoutButton}
+                                    onClick={() => router.post('/logout')}
+                                >
+                                    Logout
+                                </button>
+                            )}
                         </div>
                         <h1 style={styles.titleCenter}>Game Center Web</h1>
                     </div>
@@ -72,9 +73,15 @@ export default function Home({ user }: HomeProps) {
                         </p>
                         <div style={styles.widgetsGrid}>
                             <div style={styles.card}>
-
                                 <div style={styles.cardTitle}>Game 1</div>
-                             <iframe style={styles.iframe} src="https://itch.io/embed/4340743"><a href="https://noelcody.itch.io/moss-moss">Moss Moss by Noel Cody</a></iframe>
+                                <iframe
+                                    style={styles.iframe}
+                                    src="https://itch.io/embed/4340743"
+                                >
+                                    <a href="https://noelcody.itch.io/moss-moss">
+                                        Moss Moss by Noel Cody
+                                    </a>
+                                </iframe>
                                 <div style={styles.cardArrow}>↗</div>
                             </div>
                             <div style={styles.card}>Game 2</div>
@@ -143,26 +150,26 @@ const styles: Record<string, React.CSSProperties> = {
         objectFit: 'cover',
         zIndex: -1,
         filter: 'blur(6px) brightness(0.3)',
-          transform: 'scale(1.2)',
-  imageRendering: 'pixelated',
+        transform: 'scale(1.2)',
+        imageRendering: 'pixelated',
     },
     pixelOverlay: {
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: '100%',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
 
-  pointerEvents: 'none',
+        pointerEvents: 'none',
 
-  backgroundImage: `
+        backgroundImage: `
     linear-gradient(rgba(0,0,0,0.15) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,0,0,0.15) 1px, transparent 1px)
   `,
-  backgroundSize: '25px 25px',
+        backgroundSize: '25px 25px',
 
-  zIndex: -1,
-},
+        zIndex: -1,
+    },
     lens: {
         position: 'fixed',
         width: '100px',
@@ -170,7 +177,7 @@ const styles: Record<string, React.CSSProperties> = {
         borderRadius: '50%',
         pointerEvents: 'none',
         backgroundImage: 'url(/bg/clouds.jpg)',
-backgroundSize: '130wh 100vh',
+        backgroundSize: '130wh 100vh',
         backgroundRepeat: 'no-repeat',
 
         transform: 'translate(-50%, -50%)',
@@ -219,14 +226,14 @@ backgroundSize: '130wh 100vh',
         flex: 1,
     },
     logoutButton: {
-    padding: '0.5rem 1rem',
-    border: 'none',
-    borderRadius: '8px',
-    color: '#ef4444',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    transition: 'all 0.3s ease',
-},
+        padding: '0.5rem 1rem',
+        border: 'none',
+        borderRadius: '8px',
+        color: '#ef4444',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        transition: 'all 0.3s ease',
+    },
     logoText: {
         color: '#1e293b',
         fontSize: '1.5rem',
@@ -317,8 +324,6 @@ backgroundSize: '130wh 100vh',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
     },
-
-
 
     cardTitle: {
         fontSize: '14px',
