@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Laravel\Facades\Inertia;
+use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Illuminate\Http\Request;
 use App\Http\Controllers\MessageController;
@@ -43,14 +43,19 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', fn() => Inertia::render('admin/AdminDashboard', [
         'user' => auth()->user(),
     ]))->name('admin');
-
-   Route::get('/chat', [App\Http\Controllers\MessageController::class, 'index'])->name('chat.index');
 });
 
-Route::post('/logout', function () {
-    Auth::logout();
-    return redirect('/');
-})->name('logout');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chat', [App\Http\Controllers\MessageController::class, 'index'])->name('chat.index');
+    Route::post('/chat/messages', [App\Http\Controllers\MessageController::class, 'store'])->name('chat.store');
+});
+
+
+
+Route::middleware(['auth', 'role:admin,gestor'])->group(function () {
+    Route::get('/staff-chat', [App\Http\Controllers\StaffMessageController::class, 'index'])->name('staff.chat.index');
+    Route::post('/staff-chat/messages', [App\Http\Controllers\StaffMessageController::class, 'store'])->name('staff.chat.store');
+});
 
 Route::middleware(['auth', 'role:gestor'])->group(function () {
     Route::inertia('/gestor', 'gestor/Index');

@@ -19,7 +19,7 @@ export default function GestorIndex({ user }: GestorIndexProps) {
     <div style={styles.container}>
       {/* Header */}
       <header style={styles.header}>
-        <h1 style={styles.logoText}>🎮 Gestor Dashboard</h1>
+        <h1 style={styles.logoText}> Gestor Dashboard</h1>
         <div style={styles.headerButtons}>
           <span style={styles.userName}>Bienvenido, {user?.name}</span>
           <button onClick={handleLogout} style={styles.logoutButton}>
@@ -39,19 +39,21 @@ export default function GestorIndex({ user }: GestorIndexProps) {
         {/* Grid de opciones principales */}
         <div style={styles.optionsGrid}>
           <Link href="/gestor/games" style={styles.optionCard}>
-            <div style={styles.optionIcon}>🎮</div>
-            <h3 style={styles.optionTitle}>Mis Juegos</h3>
-            <p style={styles.optionDesc}>Gestiona tu biblioteca de juegos</p>
+            <h3 style={styles.optionTitle}>Juegos generales</h3>
+            <p style={styles.optionDesc}>Gestiona los juegos subidos por usuarios o otros gestores</p>
           </Link>
 
           <Link href="/gestor/stats" style={styles.optionCard}>
-            <div style={styles.optionIcon}>📈</div>
             <h3 style={styles.optionTitle}>Estadísticas</h3>
             <p style={styles.optionDesc}>Visualiza métricas y datos</p>
           </Link>
 
+          <Link href="/staff-chat" style={styles.optionCard}>
+            <h3 style={styles.optionTitle}>Chat</h3>
+            <p style={styles.optionDesc}>Coordinación del equipo</p>
+          </Link>
+
           <Link href="/gestor/content" style={styles.optionCard}>
-            <div style={styles.optionIcon}>📝</div>
             <h3 style={styles.optionTitle}>Contenido</h3>
             <p style={styles.optionDesc}>Crea y edita contenido</p>
           </Link>

@@ -32,6 +32,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
           <nav style={styles.nav}>
             <Link href="/admin/users" style={styles.navItem}>Gestión de Usuarios</Link>
             <Link href="/admin/games" style={styles.navItem}> Gestión de Juegos</Link>
+            <Link href="/staff-chat" style={styles.navItem}>Chat Staff</Link>
             <Link href="/admin/reports" style={styles.navItem}>Reportes</Link>
             <Link href="/admin/settings" style={styles.navItem}> Configuración</Link>
           </nav>
@@ -46,7 +47,6 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
           {/* Stats Cards */}
           <div style={styles.statsGrid}>
             <div style={styles.statCard}>
-              <div style={styles.statIcon}>👥</div>
               <div style={styles.statInfo}>
                 <span style={styles.statNumber}>150</span>
                 <span style={styles.statLabel}>Usuarios</span>

@@ -25,11 +25,11 @@
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
             html {
-                background-color: oklch(1 0 0);
+                background-color: transparent;
             }
 
             html.dark {
-                background-color: oklch(0.145 0 0);
+                background-color: transparent;
             }
         </style>
 
@@ -46,7 +46,10 @@
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         @inertiaHead
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased text-foreground bg-transparent">
+        <video autoplay loop muted playsinline style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; width: auto; height: auto; z-index: -100; object-fit: cover; filter: brightness(0.7);">
+            <source src="/bg/clouds.mp4" type="video/mp4">
+        </video>
         @inertia
     </body>
 </html>

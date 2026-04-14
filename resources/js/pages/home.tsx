@@ -7,7 +7,7 @@ interface HomeProps {
         name: string;
         email: string;
         role_id: number;
-    } ;
+    };
 }
 
 export default function Home({ user }: HomeProps) {
@@ -26,9 +26,7 @@ export default function Home({ user }: HomeProps) {
     return (
         <div style={styles.container}>
             <div style={styles.pixelOverlay} />
-            <video autoPlay loop muted playsInline style={styles.videoBg}>
-                <source src="/bg/clouds.mp4" type="video/mp4" />
-            </video>
+
 
             <div
                 style={{
@@ -84,8 +82,11 @@ export default function Home({ user }: HomeProps) {
                                 </iframe>
                                 <div style={styles.cardArrow}>↗</div>
                             </div>
-                            <div style={styles.card}>Game 2</div>
-                            <div style={styles.card}>Game 3</div>
+                            <div style={styles.card}>Game 2
+                                <iframe style={styles.iframe} src="https://itch.io/embed/4300149" width="552" height="167"><a href="https://minmaxwell.itch.io/inn-over-your-head">Inn Over Your Head by Tanner Maxwell</a></iframe>                                <div style={styles.cardArrow}>↗</div>
+                            </div>
+                            <div style={styles.card}>Game 3
+                                <iframe style={styles.iframe} src="https://itch.io/embed/3641582"><a href="https://pazur3d.itch.io/cosmic-hero-2-prologue">Cosmic Hero 2 Prologue by pazur3d</a></iframe>                            </div>
                         </div>
                         {user && (
                             <div style={styles.widgetsGrid}>
@@ -140,6 +141,7 @@ const styles: Record<string, React.CSSProperties> = {
         backgroundPosition: 'center',
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
     },
     videoBg: {
         position: 'fixed',
@@ -189,6 +191,8 @@ const styles: Record<string, React.CSSProperties> = {
     leftLinks: {
         display: 'flex',
         gap: '1rem',
+        position: 'relative',
+        zIndex: 50,
     },
 
     titleCenter: {
@@ -203,6 +207,7 @@ const styles: Record<string, React.CSSProperties> = {
     iframe: {
         width: '100%',
         height: '100%',
+        minHeight: '180px',
         border: 'none',
         borderRadius: '10px',
     },
