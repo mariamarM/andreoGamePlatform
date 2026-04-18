@@ -4,11 +4,10 @@
 2. [Stack Tecnológico](#stack-tecnológico)
 3. [Arquitectura del Sistema](#arquitectura-del-sistema)
 4. [Flujo de Reconocimiento Facial Actual](#flujo-de-reconocimiento-facial-actual)
-5. [Funcionalidad Pendiente: Reconocimiento de Emociones](#funcionalidad-pendiente-reconocimiento-de-emociones)
+5. [Reconocimiento de Emociones (Implementado)](#reconocimiento-de-emociones)
 6. [Estructura del Proyecto](#estructura-del-proyecto)
 7. [Configuración y Variables de Entorno](#configuración-y-variables-de-entorno)
 8. [Instalación y Ejecución](#instalación-y-ejecución)
-
 
 ## Descripción General
 
@@ -471,15 +470,12 @@ andreoGamePlatform/
     ```
 
 3. Asegurar que el servicio Python tenga acceso a las fotos enviadas y ejecute:
-
     - Generación de embeddings (FaceNet / ArcFace)
     - Comparación por distancia (cosine similarity)
-   
 
 ---
 
 ## PENDIENTE: Roadmap de Reconocimiento de Emociones
-
 
 4. **Backend listener (Laravel Echo)**
     - Frontend del juego suscribirse a evento `Game.EmotionDetected`
@@ -503,10 +499,6 @@ andreoGamePlatform/
 - **Derecho al olvido**: Permitir borrar logs de emociones.
 - **Protección de menores**: Si hay usuarios menores, consultar con legal antes de implementar.
 
-
-
-
-
 **¿Por qué el facial login es en 2 pasos?**  
 Para no exponer el token de sesión hasta confirmar que el rostro coincide. Primero validamos credenciales (email+pass) y luego, si la cara coincide, autenticamos.
 
@@ -521,8 +513,5 @@ Depende de tu implementación Python. Si usas modelos open-source (MTCNN + FaceN
 
 **¿Se puede usar el login facial como único método?**  
 Sí, pero actualmente el sistema híbrido (pass + facial) ofrece capa de seguridad adicional. Para eliminar contraseña, modificar el flujo para que el email sea solo identificador y la autenticación sea 100% biométrica.
+
 ---
-
-
-
-
