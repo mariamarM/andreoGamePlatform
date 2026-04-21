@@ -10,6 +10,10 @@ Route::post('/games', [GameController::class, 'store']);
 Route::get('/users', function () {
     return response()->json(User::all());
 });
+
+Route::middleware('auth')->group(function () {
+    Route::post('/game-sessions', [GameSessionController::class, 'store']);
+});
 Route::get('/roles', function () {
     return response()->json(Role::all());
 });

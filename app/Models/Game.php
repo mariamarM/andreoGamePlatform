@@ -17,4 +17,8 @@ public function user()
 {
     return $this->belongsTo(User::class);
 }
+public function sessions()
+{
+    return $this->hasMany(GameSession::class);
+}
 }
