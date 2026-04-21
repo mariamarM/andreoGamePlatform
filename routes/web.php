@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\GameEmotionController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\GameController;
 use App\Http\Controllers\StaffMessageController;
 use App\Models\Game;
 use App\Models\User;
@@ -157,7 +158,6 @@ Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
 | Páginas Principales (Inertia)
 |--------------------------------------------------------------------------
 */
-
 Route::inertia('/', 'Home', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('Home');
@@ -171,7 +171,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/chat', [MessageController::class, 'index'])->name('chat.index');
     Route::post('/chat/messages', [MessageController::class, 'store'])->name('chat.store');
-
+Route::get('/play/{id}', [GameController::class, 'play']);
     Route::post('/settings/face-photo', function (Request $request) {
         $request->validate([
             'face_photo' => 'required|image|mimes:jpg,jpeg,png|max:5120',
