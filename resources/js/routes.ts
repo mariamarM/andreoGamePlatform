@@ -13,8 +13,12 @@ export function login() {
     return '/login';
 }
 
-
-
+export function game(id: number) {
+    return `/game/${id}`;
+}
+export function chat(){
+    return '/chat';
+}
 export function logout() {
     return '/logout';
 }

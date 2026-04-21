@@ -39,7 +39,7 @@ Route::post('/test-facial', function (Request $request, FacialRecognitionService
         'resultado' => $resultado,
     ]);
 })->name('test.facial');
-
+Route::post('/game-sessions', [GameSessionController::class, 'store']);
 /*
 |--------------------------------------------------------------------------
 | Autenticación Facial (Login Híbrido)
