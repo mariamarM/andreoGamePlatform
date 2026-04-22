@@ -1,4 +1,7 @@
 <?php
+
+namespace App\Http\Controllers;
+
 use App\Models\GameSession;
 use Illuminate\Http\Request;
 
@@ -9,7 +12,7 @@ class GameSessionController extends Controller
         $request->validate([
             'game_id' => 'required|exists:games,id',
             'score' => 'required|integer',
-            'data' => 'nullable'
+            'data' => 'nullable',
         ]);
 
         $session = GameSession::updateOrCreate(
@@ -19,13 +22,13 @@ class GameSessionController extends Controller
             ],
             [
                 'score' => $request->score,
-                'data' => $request->data
+                'data' => $request->data,
             ]
         );
 
         return response()->json([
             'success' => true,
-            'session' => $session
+            'session' => $session,
         ]);
     }
 }

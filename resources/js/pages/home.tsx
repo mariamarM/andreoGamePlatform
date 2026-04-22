@@ -27,7 +27,6 @@ export default function Home({ user }: HomeProps) {
         <div style={styles.container}>
             <div style={styles.pixelOverlay} />
 
-
             <div
                 style={{
                     ...styles.lens,
@@ -69,24 +68,36 @@ export default function Home({ user }: HomeProps) {
                                 ? 'Explora todas las funcionalidades según tu rol.'
                                 : 'La mejor plataforma para gestionar y jugar juegos.'}
                         </p>
+                        {/* Juegos del juego - clicables */}
                         <div style={styles.widgetsGrid}>
-                            <div style={styles.card}>
-                                <div style={styles.cardTitle}>Game 1</div>
+                            <Link href="/game/4" style={styles.card}>
+                                <div style={styles.cardTitle}>Moss Moss</div>
                                 <iframe
                                     style={styles.iframe}
                                     src="https://itch.io/embed/4340743"
-                                >
-                                    <a href="https://noelcody.itch.io/moss-moss">
-                                        Moss Moss by Noel Cody
-                                    </a>
-                                </iframe>
+                                />
                                 <div style={styles.cardArrow}>↗</div>
-                            </div>
-                            <div style={styles.card}>Game 2
-                                <iframe style={styles.iframe} src="https://itch.io/embed/4300149" width="552" height="167"><a href="https://minmaxwell.itch.io/inn-over-your-head">Inn Over Your Head by Tanner Maxwell</a></iframe>                                <div style={styles.cardArrow}>↗</div>
-                            </div>
-                            <div style={styles.card}>Game 3
-                                <iframe style={styles.iframe} src="https://itch.io/embed/3641582"><a href="https://pazur3d.itch.io/cosmic-hero-2-prologue">Cosmic Hero 2 Prologue by pazur3d</a></iframe>                            </div>
+                            </Link>
+                            <Link href="/game/5" style={styles.card}>
+                                <div style={styles.cardTitle}>
+                                    Inn Over Your Head
+                                </div>
+                                <iframe
+                                    style={styles.iframe}
+                                    src="https://itch.io/embed/4300149"
+                                />
+                                <div style={styles.cardArrow}>↗</div>
+                            </Link>
+                            <Link href="/game/6" style={styles.card}>
+                                <div style={styles.cardTitle}>
+                                    Cosmic Hero 2
+                                </div>
+                                <iframe
+                                    style={styles.iframe}
+                                    src="https://itch.io/embed/3641582"
+                                />
+                                <div style={styles.cardArrow}>↗</div>
+                            </Link>
                         </div>
                         {user && (
                             <div style={styles.widgetsGrid}>

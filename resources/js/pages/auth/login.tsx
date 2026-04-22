@@ -1,4 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -11,7 +13,6 @@ import AuthLayout from '@/layouts/auth-layout';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { useState, useRef, useCallback, useEffect } from 'react';
 
 type Props = {
     status?: string;
@@ -54,6 +55,7 @@ export default function Login({
                 video: { facingMode: 'user', width: 640, height: 480 }
             });
             streamRef.current = stream;
+
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
             }
@@ -122,6 +124,7 @@ export default function Login({
         const video = videoRef.current;
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
+
         if (!ctx) return;
 
         canvas.width = video.videoWidth;
@@ -160,6 +163,7 @@ export default function Login({
             if (!blob) {
                 setFacialMessage('Error al procesar la imagen.');
                 setFacialStatus('error');
+
                 return;
             }
 
@@ -193,6 +197,7 @@ export default function Login({
         } catch (err) {
             setFacialMessage('Error al verificar. Inténtalo de nuevo.');
             setFacialStatus('error');
+
         }
     }, []);
 
@@ -301,7 +306,7 @@ export default function Login({
                                         <circle cx="12" cy="10" r="3" />
                                         <path d="M7 17s1.5-2 5-2 5 2 5 2" />
                                     </svg>
-                                    🔐 Verificar con Reconocimiento Facial
+                                    Verificar con Reconocimiento Facial
                                 </span>
                             </button>
                         </div>

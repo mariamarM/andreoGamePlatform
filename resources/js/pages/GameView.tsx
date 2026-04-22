@@ -1,87 +1,135 @@
-import {  useState } from "react";
+import { useState } from 'react';
+import GameChat from '@/components/MisComponentes/GameChat';
 
 interface GameViewProps {
     game: {
         id: number;
         title: string;
-        itch_url: string;
+        url: string;
     };
     user: {
         id: number;
         name: string;
         email: string;
     };
+    messages?: Array<{
+        id: number;
+        user: string;
+        message: string;
+    }>;
 }
-
 
 const styles: Record<string, React.CSSProperties> = {
     container: {
-        display: "grid",
-        gridTemplateColumns: "2fr 1fr",
-        height: "100vh",
-        gap: "10px",
-        padding: "10px",
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        background: '#0a0a0a',
     },
 
-    left: {
-        background: "#000",
-        borderRadius: "10px",
-        overflow: "hidden",
+    header: {
+        background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+        padding: '15px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderBottom: '2px solid #00d4ff',
+    },
+
+    statsSection: {
+        display: 'flex',
+        gap: '30px',
+        alignItems: 'center',
+    },
+
+    statItem: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+
+    statLabel: {
+        fontSize: '11px',
+        color: '#00d4ff',
+        textTransform: 'uppercase',
+        letterSpacing: '1px',
+    },
+
+    statValue: {
+        fontSize: '20px',
+        fontWeight: 'bold',
+        color: '#fff',
+    },
+
+    gameSection: {
+        flex: 1,
+        background: '#000',
+        overflow: 'hidden',
     },
 
     iframe: {
-        width: "100%",
-        height: "100%",
-        border: "none",
+        width: '100%',
+        height: '100%',
+        border: 'none',
     },
 
-    right: {
-        display: "grid",
-        gridTemplateRows: "1fr 1fr",
-        gap: "10px",
+    chatSection: {
+        background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%)',
+        height: '250px',
+        display: 'flex',
+        flexDirection: 'column',
+        borderTop: '2px solid #00d4ff',
     },
 
-    topRight: {
-        background: "#111",
-        color: "#fff",
-        padding: "20px",
-        borderRadius: "10px",
+    chatHeader: {
+        padding: '10px 20px',
+        borderBottom: '1px solid rgba(0,212,255,0.3)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
     },
 
-    bottomRight: {
-        background: "#1a1a1a",
-        color: "#fff",
-        padding: "20px",
-        borderRadius: "10px",
-        display: "flex",
-        flexDirection: "column",
+    chatTitle: {
+        fontSize: '14px',
+        color: '#00d4ff',
+        fontWeight: 'bold',
+        margin: 0,
+    },
+
+    chatBody: {
+        flex: 1,
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
     },
 
     input: {
-        width: "100%",
-        padding: "8px",
-        marginTop: "10px",
-        borderRadius: "6px",
-        border: "none",
+        width: '100%',
+        padding: '12px 15px',
+        background: 'rgba(0,0,0,0.5)',
+        border: '1px solid rgba(0,212,255,0.3)',
+        borderRadius: '8px',
+        color: '#fff',
+        fontSize: '14px',
+        outline: 'none',
     },
 
     button: {
-        marginTop: "10px",
-        padding: "10px",
-        background: "#22c55e",
-        border: "none",
-        borderRadius: "6px",
-        color: "#fff",
-        cursor: "pointer",
-        fontWeight: "bold",
+        padding: '12px 25px',
+        background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)',
+        border: 'none',
+        borderRadius: '8px',
+        color: '#000',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        fontSize: '14px',
+        transition: 'all 0.3s ease',
     },
 
-    chatPlaceholder: {
-        marginTop: "10px",
-        flex: 1,
-        background: "#000",
-        borderRadius: "6px",
-        padding: "10px",
+    inputGroup: {
+        display: 'flex',
+        gap: '10px',
+        padding: '15px 20px',
     },
 };
 export default function GameView({ game, user }: GameViewProps) {
@@ -89,83 +137,82 @@ export default function GameView({ game, user }: GameViewProps) {
     const [savedScore, setSavedScore] = useState<number | null>(null);
 
     const guardarPuntuacion = async () => {
-    try {
-        const token = (document.querySelector(
-            'meta[name="csrf-token"]'
-        ) as HTMLMetaElement).content;
+        try {
+            const token = (
+                document.querySelector(
+                    'meta[name="csrf-token"]',
+                ) as HTMLMetaElement
+            ).content;
 
-        const res = await fetch("/api/game-sessions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": token,
-            },
-            body: JSON.stringify({
-                game_id: game.id,
-                score: score,
-            }),
-        });
+            const res = await fetch('/api/game-sessions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                },
+                body: JSON.stringify({
+                    game_id: game.id,
+                    score: score,
+                }),
+            });
 
-        const data = await res.json();
+            const data = await res.json();
 
-        if (data.success) {
-            setSavedScore(data.session.score);
+            if (data.success) {
+                setSavedScore(data.session.score);
+            }
+        } catch (error) {
+            console.error(error);
         }
-    } catch (error) {
-        console.error(error);
-    }
-};
+    };
 
     return (
         <div style={styles.container}>
-            {/* IZQUIERDA - JUEGO */}
-            <div style={styles.left}>
-                <iframe
-                    src={game.itch_url}
-                    style={styles.iframe}
-                    allowFullScreen
+            {/* HEADER con Stats */}
+            <div style={styles.header}>
+                <h1 style={{ color: '#fff', margin: 0, fontSize: '20px' }}>
+                    {game.title}
+                </h1>
+                <div style={styles.statsSection}>
+                    <div style={styles.statItem}>
+                        <span style={styles.statLabel}>Puntuación</span>
+                        <span style={styles.statValue}>
+                            {savedScore ?? '—'}
+                        </span>
+                    </div>
+                    <div style={styles.statItem}>
+                        <span style={styles.statLabel}>Jugador</span>
+                        <span style={{ color: '#fff', fontSize: '16px' }}>
+                            {user.name}
+                        </span>
+                    </div>
+                </div>
+                <input
+                    type="number"
+                    placeholder="Puntuación"
+                    value={score}
+                    onChange={(e) => setScore(Number(e.target.value))}
+                    style={styles.input}
                 />
+                <button onClick={guardarPuntuacion} style={styles.button}>
+                    Guardar
+                </button>
             </div>
 
-            {/* DERECHA */}
-            <div style={styles.right}>
-                {/* DATOS */}
-                <div style={styles.topRight}>
-                    <h2>{game.title}</h2>
+            {/* JUEGO */}
+            <div style={styles.gameSection}>
+                <iframe src={game.url} style={styles.iframe} allowFullScreen />
+            </div>
 
-                    <p><strong>Jugador:</strong> {user.name}</p>
-
-                    <p>
-                        <strong>Puntuación guardada:</strong>{" "}
-                        {savedScore ?? "Sin guardar"}
-                    </p>
-
-                    <input
-                        type="number"
-                        placeholder="Introduce puntuación"
-                        value={score}
-                        onChange={(e) => setScore(Number(e.target.value))}
-                        style={styles.input}
-                    />
-
-                    <button onClick={guardarPuntuacion} style={styles.button}>
-                        Guardar puntuación
-                    </button>
+            {/* CHAT */}
+            <div style={styles.chatSection}>
+                <div style={styles.chatHeader}>
+                    <h3 style={styles.chatTitle}>Chat de Jugadores</h3>
                 </div>
-
-                {/* CHAT */}
-                <div style={styles.bottomRight}>
-                    <h3>Chat en vivo</h3>
-
-                    {/* Aquí puedes reutilizar tu componente de chat */}
-                    {/* <Chat /> */}
-
-                    <div style={styles.chatPlaceholder}>
-                        Chat aquí...
-                    </div>
+                <div style={styles.chatBody}>
+                    <GameChat messages={messages || []} />
                 </div>
             </div>
         </div>
     );
 }
-
