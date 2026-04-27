@@ -19,9 +19,9 @@ export default function GestorIndex({ user }: GestorIndexProps) {
     <div style={styles.container}>
       {/* Header */}
       <header style={styles.header}>
-        <h1 style={styles.logoText}> Gestor Dashboard</h1>
+        <h1 style={styles.logoText}>Panel de Gestor</h1>
         <div style={styles.headerButtons}>
-          <span style={styles.userName}>Bienvenido, {user?.name}</span>
+          <span style={styles.userName}>Hola, {user?.name}</span>
           <button onClick={handleLogout} style={styles.logoutButton}>
             Cerrar Sesión
           </button>
@@ -32,7 +32,7 @@ export default function GestorIndex({ user }: GestorIndexProps) {
       <main style={styles.main}>
         {/* Welcome Banner */}
         <div style={styles.welcomeBanner}>
-          <h2 style={styles.welcomeTitle}>Bienvenido, {user?.name}</h2>
+          <h2 style={styles.welcomeTitle}>Bienvenido gestor</h2>
           <p style={styles.welcomeText}>Gestiona tus juegos y contenido</p>
         </div>
 
@@ -59,7 +59,6 @@ export default function GestorIndex({ user }: GestorIndexProps) {
           </Link>
         </div>
 
-        {/* Panel inferior */}
         <div style={styles.bottomPanel}>
           <div style={styles.quickStats}>
             <div style={styles.quickStat}>
@@ -92,10 +91,6 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '1rem 2rem',
-    background: 'rgba(255, 255, 255, 0.7)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
-    boxShadow: '0 2px 20px rgba(0, 0, 0, 0.1)',
     height: '60px',
   },
   logoText: {
@@ -130,9 +125,9 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '1.5rem',
   },
   welcomeBanner: {
-    background: 'rgba(255, 255, 255, 0.75)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
+    background: 'rgba(255, 255, 255, 0.54)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
     borderRadius: '24px',
     border: '1px solid rgba(255, 255, 255, 0.5)',
     padding: '2rem 3rem',
@@ -161,28 +156,27 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(255, 255, 255, 0.75)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
+    background: 'rgba(255, 255, 255, 0.4)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
     borderRadius: '24px',
     border: '1px solid rgba(255, 255, 255, 0.5)',
     padding: '2rem',
     textDecoration: 'none',
     transition: 'all 0.3s ease',
-    boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)',
   },
   optionIcon: {
     fontSize: '4rem',
     marginBottom: '1rem',
   },
   optionTitle: {
-    color: '#1e293b',
+    color: '#101927ff',
     fontSize: '1.4rem',
     fontWeight: 'bold',
     margin: '0 0 0.5rem 0',
   },
   optionDesc: {
-    color: 'rgba(30, 41, 59, 0.8)',
+    color: '#101927ff',
     fontSize: '0.95rem',
     margin: 0,
     textAlign: 'center',
@@ -194,7 +188,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: '20px',
     border: '1px solid rgba(255, 255, 255, 0.5)',
     padding: '1.5rem',
-    boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)',
   },
   quickStats: {
     display: 'flex',
@@ -212,7 +205,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 'bold',
   },
   quickStatLabel: {
-    color: 'rgba(30, 41, 59, 0.7)',
+    color: '1e293b',
     fontSize: '0.85rem',
   },
 };

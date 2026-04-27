@@ -42,17 +42,20 @@ export default function Home({ user }: HomeProps) {
 
                     <div style={styles.header}>
                         <div style={styles.leftLinks}>
-                            <Link href="/login">Login</Link>
-                            <Link href="/register">Register</Link>
-                            <Link href="/chat">Chat</Link>
-                            {user && (
+                            {!user ? (
+                                <>
+                                    <Link href="/login">Login</Link>
+                                    <Link href="/register">Register</Link>
+                                </>
+                            ) : (
                                 <button
                                     style={styles.logoutButton}
                                     onClick={() => router.post('/logout')}
                                 >
-                                    Logout
+                                    Cerrar Sesión
                                 </button>
                             )}
+                            <Link href="/chat">Chat</Link>
                         </div>
                         <h1 style={styles.titleCenter}>Game Center Web</h1>
                     </div>

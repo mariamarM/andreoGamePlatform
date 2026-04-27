@@ -159,9 +159,12 @@ Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
 | Páginas Principales (Inertia)
 |--------------------------------------------------------------------------
 */
-Route::inertia('/', 'Home', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('Home');
+Route::get('/', function (Request $request) {
+    return Inertia::render('Home', [
+        'user' => $request->user(),
+        'canRegister' => Features::enabled(Features::registration()),
+    ]);
+})->name('Home');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin', fn (Request $request) => Inertia::render('admin/AdminDashboard', [
@@ -192,11 +195,22 @@ Route::middleware(['auth', 'role:admin,gestor'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:gestor'])->group(function () {
-    Route::inertia('/gestor', 'gestor/Index');
+    Route::get('/gestor', fn (Request $request) => Inertia::render('gestor/Index', [
+        'user' => $request->user(),
+    ]))->name('gestor');
 });
 
 Route::get('/games', fn () => Inertia::render('Games', [
     'games' => Game::where('is_published', true)->get(),
 ]))->name('games');
+
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/');
+})->name('logout');
 
 require __DIR__.'/settings.php';
