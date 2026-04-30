@@ -43,20 +43,14 @@ export default function GestorIndex({ user }: GestorIndexProps) {
             <p style={styles.optionDesc}>Gestiona los juegos subidos por usuarios o otros gestores</p>
           </Link>
 
-          <Link href="/gestor/stats" style={styles.optionCard}>
-            <h3 style={styles.optionTitle}>Estadísticas</h3>
-            <p style={styles.optionDesc}>Visualiza métricas y datos</p>
-          </Link>
+
 
           <Link href="/staff-chat" style={styles.optionCard}>
             <h3 style={styles.optionTitle}>Chat</h3>
             <p style={styles.optionDesc}>Coordinación del equipo</p>
           </Link>
 
-          <Link href="/gestor/content" style={styles.optionCard}>
-            <h3 style={styles.optionTitle}>Contenido</h3>
-            <p style={styles.optionDesc}>Crea y edita contenido</p>
-          </Link>
+
         </div>
 
         <div style={styles.bottomPanel}>
