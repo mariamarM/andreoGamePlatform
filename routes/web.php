@@ -198,8 +198,18 @@ Route::middleware(['auth', 'role:gestor'])->group(function () {
     Route::get('/gestor', fn (Request $request) => Inertia::render('gestor/Index', [
         'user' => $request->user(),
     ]))->name('gestor');
-        Route::get('/gestor/games', fn () => Inertia::render('gestor/Show'))->name('gestor.games');
-
+    
+    Route::get('/gestor/games', fn (Request $request) => Inertia::render('gestor/Show', [
+        'user' => $request->user(),
+    ]))->name('gestor.games');
+    
+    Route::get('/gestor/games/create', fn (Request $request) => Inertia::render('gestor/Create', [
+        'user' => $request->user(),
+    ]))->name('gestor.games.create');
+    
+    Route::get('/gestor/games/{id}/edit', fn (Request $request) => Inertia::render('gestor/Edit', [
+        'user' => $request->user(),
+    ])->name('gestor.games.edit'));
 });
 
 Route::get('/games', fn () => Inertia::render('Games', [

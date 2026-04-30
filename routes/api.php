@@ -7,6 +7,8 @@ use App\Models\User;
 Route::get('/games', [GameController::class, 'devolverJson']);
 Route::get('/games/{id}', [GameController::class, 'show']);
 Route::post('/games', [GameController::class, 'store']);
+Route::put('/games/{id}', [GameController::class, 'update']);
+Route::delete('/games/{id}', [GameController::class, 'destroy']);
 Route::get('/users', function () {
     return response()->json(User::all());
 });

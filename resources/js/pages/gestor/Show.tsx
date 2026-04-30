@@ -1,4 +1,4 @@
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react';
 
 interface Game {
@@ -29,9 +29,11 @@ export default function GestorShow({ user }: GestorShowProps) {
       try {
         setLoading(true);
         const response = await fetch('/api/games');
+
         if (!response.ok) {
           throw new Error(`Error fetching games: ${response.status}`);
         }
+
         const data: Game[] = await response.json();
         setGames(data);
       } catch (err) {
@@ -108,9 +110,9 @@ export default function GestorShow({ user }: GestorShowProps) {
                 <div style={styles.gameInfo}>
                   <h3 style={styles.gameTitle}>{game.title}</h3>
                   <p style={styles.gameDescription}>{game.description}</p>
-                  <a 
-                    href={game.url} 
-                    target="_blank" 
+                  <a
+                    href={game.url}
+                    target="_blank"
                     rel="noopener noreferrer"
                     style={styles.gameUrl}
                   >
@@ -118,14 +120,14 @@ export default function GestorShow({ user }: GestorShowProps) {
                   </a>
                 </div>
                 <div style={styles.gameActions}>
-                  <button 
-                    onClick={() => handleEdit(game.id)} 
+                  <button
+                    onClick={() => handleEdit(game.id)}
                     style={styles.editButton}
                   >
                     Editar
                   </button>
-                  <button 
-                    onClick={() => handleDelete(game.id)} 
+                  <button
+                    onClick={() => handleDelete(game.id)}
                     style={styles.deleteButton}
                   >
                     Eliminar
