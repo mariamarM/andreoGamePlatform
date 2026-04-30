@@ -14,7 +14,7 @@ de logearse.
 6. [Estructura del Proyecto](#estructura-del-proyecto)
 7. [Configuración y Variables de Entorno](#configuración-y-variables-de-entorno)
 8. [Instalación y Ejecución](#instalación-y-ejecución)
-
+9. [RabbitMQ y optimizaciçon de procesos](#rabbitmq).
 
 ## Descripción General
 
@@ -299,6 +299,11 @@ Depende de tu implementación Python. Si usas modelos open-source (MTCNN + FaceN
 Sí, pero actualmente el sistema híbrido (pass + facial) ofrece capa de seguridad adicional. Para eliminar contraseña, modificar el flujo para que el email sea solo identificador y la autenticación sea 100% biométrica.
 ---
 
+### 9.RabbitMQ
 
+RabbitMQ es un sistema de mensajería asíncrona utilizando RabbitMQ, una herramienta ampliamente utilizada para la comunicación entre servicios desacoplados. El objetivo principal es mejorar la escalabilidad y la eficiencia de la aplicación mediante el uso de colas de mensajes.
 
+El proyecto conecta GitHub, MCP y RabbitMQ para crear un sistema donde los eventos del desarrollo (como pull requests o issues) generan acciones automáticas procesadas de forma asíncrona. Esto permite mejorar la organización, la escalabilidad y la mantenibilidad de la aplicación, acercándola a un entorno real de desarrollo profesional.
+Este es el esquema que me dio Claude para que tenga presente la estructura actual del proyecto asi puede identificar los issues y procesarlos en el rabbitMQ
+<img width="737" height="574" alt="image" src="https://github.com/user-attachments/assets/bea507b5-bf84-4cbe-9293-9d9dfbc3f1cd" />
 
