@@ -1,6 +1,14 @@
 import { router, Link } from '@inertiajs/react';
 import React, { useEffect, useState } from 'react';
 
+interface Game {
+    id: number;
+    title: string;
+    description: string;
+    url: string;
+    is_published: boolean;
+}
+
 interface HomeProps {
     user?: {
         id: number;
@@ -8,9 +16,10 @@ interface HomeProps {
         email: string;
         role_id: number;
     };
+    games: Game[];
 }
 
-export default function Home({ user }: HomeProps) {
+export default function Home({ user, games }: HomeProps) {
     const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
     useEffect(() => {
@@ -73,34 +82,19 @@ export default function Home({ user }: HomeProps) {
                         </p>
                         {/* Juegos del juego - clicables */}
                         <div style={styles.widgetsGrid}>
-                            <Link href="/game/4" style={styles.card}>
-                                <div style={styles.cardTitle}>Moss Moss</div>
-                                <iframe
-                                    style={styles.iframe}
-                                    src="https://itch.io/embed/4340743"
-                                />
-                                <div style={styles.cardArrow}>↗</div>
-                            </Link>
-                            <Link href="/game/5" style={styles.card}>
-                                <div style={styles.cardTitle}>
-                                    Inn Over Your Head
-                                </div>
-                                <iframe
-                                    style={styles.iframe}
-                                    src="https://itch.io/embed/4300149"
-                                />
-                                <div style={styles.cardArrow}>↗</div>
-                            </Link>
-                            <Link href="/game/6" style={styles.card}>
-                                <div style={styles.cardTitle}>
-                                    Cosmic Hero 2
-                                </div>
-                                <iframe
-                                    style={styles.iframe}
-                                    src="https://itch.io/embed/3641582"
-                                />
-                                <div style={styles.cardArrow}>↗</div>
-                            </Link>
+                            {games.map((game) => (
+                                <Link key={game.id} href={`/game/${game.id}`} style={styles.card}>
+                                    <div style={styles.cardTitle}>{game.title}</div>
+                                    <div style={styles.iframeWrapper}>
+                                        <iframe
+                                            style={styles.iframe}
+                                            src={game.url}
+                                            title={game.title}
+                                        />
+                                    </div>
+                                    <div style={styles.cardArrow}>↗</div>
+                                </Link>
+                            ))}
                         </div>
                         {user && (
                             <div style={styles.widgetsGrid}>
@@ -221,9 +215,15 @@ const styles: Record<string, React.CSSProperties> = {
     iframe: {
         width: '100%',
         height: '100%',
-        minHeight: '180px',
         border: 'none',
         borderRadius: '10px',
+    },
+    iframeWrapper: {
+        width: '100%',
+        height: '180px',
+        overflow: 'hidden',
+        borderRadius: '10px',
+        background: '#000',
     },
     innerBlur: {
         position: 'absolute',

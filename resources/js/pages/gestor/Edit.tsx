@@ -1,258 +1,175 @@
-import { router, usePage } from '@inertiajs/react';
-import React, { useEffect, useState } from 'react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import React from 'react';
 
 interface Game {
-  id: number;
-  title: string;
-  description: string;
-  url: string;
-}
-
-interface GestorEditProps {
-  user?: {
     id: number;
-    name: string;
-    email: string;
-    role_id: number;
-  } | null;
+    title: string;
+    description: string;
+    url: string;
+    is_published: boolean;
 }
 
-export default function GestorEdit({ user }: GestorEditProps) {
-  const { data } = usePage().props;
-  const [game, setGame] = useState<Game | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface Props {
+    game: Game;
+}
 
-  // Fetch game from API
-  useEffect(() => {
-    const fetchGame = async () => {
-      try {
-        setLoading(true);
-        const id = data.params?.id;
-        if (!id) {
-          throw new Error('Game ID not provided');
-        }
-        const response = await fetch(`/api/games/${id}`);
-        if (!response.ok) {
-          throw new Error(`Error fetching game: ${response.status}`);
-        }
-        const data: Game = await response.json();
-        setGame(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-        console.error('Error fetching game:', err);
-      } finally {
-        setLoading(false);
-      }
+export default function GestorEdit({ game }: Props) {
+    const { data, setData, put, processing, errors } = useForm({
+        title: game.title,
+        description: game.description,
+        url: game.url,
+        is_published: game.is_published,
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        put(`/gestor/games/${game.id}`);
     };
 
-    fetchGame();
-  }, [data.params?.id]);
+    return (
+        <div style={styles.container}>
+            <Head title={`Editar: ${game.title}`} />
+            <div style={styles.header}>
+                <h1 style={styles.title}>Editar Juego</h1>
+                <Link href="/gestor/games" style={styles.backLink}>← Volver</Link>
+            </div>
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!game) return;
+            <main style={styles.main}>
+                <form onSubmit={handleSubmit} style={styles.form}>
+                    <div style={styles.formGroup}>
+                        <label style={styles.label}>Título del Juego</label>
+                        <input
+                            value={data.title}
+                            onChange={e => setData('title', e.target.value)}
+                            style={styles.input}
+                        />
+                        {errors.title && <span style={styles.error}>{errors.title}</span>}
+                    </div>
 
-    const formData = new FormData(e.currentTarget);
-    const updatedGame = {
-      title: formData.get('title') as string,
-      description: formData.get('description') as string,
-      url: formData.get('url') as string,
-    };
+                    <div style={styles.formGroup}>
+                        <label style={styles.label}>Descripción</label>
+                        <textarea
+                            value={data.description}
+                            onChange={e => setData('description', e.target.value)}
+                            style={styles.textarea}
+                        />
+                        {errors.description && <span style={styles.error}>{errors.description}</span>}
+                    </div>
 
-    try {
-      const response = await fetch(`/api/games/${game.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          // Assuming we need to send CSRF token or similar, adjust as needed
-          // In a real app, you might get the token from a meta tag or similar
-        },
-        body: JSON.stringify(updatedGame),
-      });
+                    <div style={styles.formGroup}>
+                        <label style={styles.label}>URL del Juego</label>
+                        <input
+                            value={data.url}
+                            onChange={e => setData('url', e.target.value)}
+                            style={styles.input}
+                        />
+                        {errors.url && <span style={styles.error}>{errors.url}</span>}
+                    </div>
 
-      if (!response.ok) {
-        throw new Error(`Error updating game: ${response.status}`);
-      }
+                    <div style={styles.checkboxGroup}>
+                        <input
+                            type="checkbox"
+                            checked={data.is_published}
+                            onChange={e => setData('is_published', e.target.checked)}
+                            id="is_published"
+                        />
+                        <label htmlFor="is_published" style={styles.checkboxLabel}>Publicado</label>
+                    </div>
 
-      // Redirect back to the games list
-      router.visit('/gestor/games');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-      console.error('Error updating game:', err);
-    }
-  };
-
-  if (loading) {
-    return <div>Cargando juego...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!game) {
-    return <div>Juego no encontrado.</div>;
-  }
-
-  return (
-    <div style={styles.container}>
-      {/* Header */}
-      <header style={styles.header}>
-        <h1 style={styles.logoText}>Editar Juego</h1>
-        <div style={styles.headerButtons}>
-          <Link href="/gestor/games" style={styles.backButton}>
-            ← Volver a Juegos
-          </Link>
+                    <button type="submit" disabled={processing} style={styles.submitButton}>
+                        {processing ? 'Guardando...' : 'Guardar Cambios'}
+                    </button>
+                </form>
+            </main>
         </div>
-      </header>
-
-      {/* Edit Form */}
-      <main style={styles.main}>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Título:</label>
-            <input
-              type="text"
-              value={game.title}
-              onChange={(e) => setGame((prev) => prev ? { ...prev, title: e.target.value } : null)}
-              style={styles.input}
-              required
-            />
-          </div>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Descripción:</label>
-            <textarea
-              value={game.description}
-              onChange={(e) => setGame((prev) => prev ? { ...prev, description: e.target.value } : null)}
-              style={styles.textarea}
-              required
-            />
-          </div>
-          <div style={styles.formGroup}>
-            <label style={styles.label}>URL del Juego:</label>
-            <input
-              type="url"
-              value={game.url}
-              onChange={(e) => setGame((prev) => prev ? { ...prev, url: e.target.value } : null)}
-              style={styles.input}
-              required
-            />
-          </div>
-          <div style={styles.formActions}>
-            <button type="submit" style={styles.submitButton}>
-              Guardar Cambios
-            </button>
-            <button
-              type="button"
-              onClick={() => router.visit(`/gestor/games`)}
-              style={styles.cancelButton}
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
-      </main>
-    </div>
-  );
+    );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: {
-    minHeight: '100vh',
-    width: '100%',
-    fontFamily: 'system-ui, -apple-system, sans-serif',
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '1.5rem 2rem',
-    backgroundColor: '#fff',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  },
-  logoText: {
-    color: '#1e293b',
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    margin: 0,
-  },
-  headerButtons: {
-    display: 'flex',
-    gap: '1rem',
-  },
-  backButton: {
-    padding: '0.5rem 1rem',
-    backgroundColor: '#3b82f6',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    textDecoration: 'none',
-    fontWeight: 500,
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-  },
-  main: {
-    padding: '2rem',
-  },
-  form: {
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    padding: '2rem',
-  },
-  formGroup: {
-    marginBottom: '1.5rem',
-  },
-  label: {
-    display: 'block',
-    marginBottom: '0.5rem',
-    fontWeight: '600',
-    color: '#1e293b',
-  },
-  input: {
-    width: '100%',
-    padding: '0.75rem',
-    border: '1px solid #e2e8f0',
-    borderRadius: '6px',
-    fontSize: '1rem',
-  },
-  textarea: {
-    width: '100%',
-    padding: '0.75rem',
-    border: '1px solid #e2e8f0',
-    borderRadius: '6px',
-    fontSize: '1rem',
-    minHeight: '100px',
-    resize: 'vertical',
-  },
-  formActions: {
-    display: 'flex',
-    gap: '1rem',
-    marginTop: '2rem',
-  },
-  submitButton: {
-    flex: 1,
-    padding: '0.75rem',
-    backgroundColor: '#10b981',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-  },
-  cancelButton: {
-    flex: 1,
-    padding: '0.75rem',
-    backgroundColor: '#64748b',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-  },
+    container: {
+        padding: '40px',
+        background: '#f8fafc',
+        minHeight: '100vh',
+        fontFamily: "'Inter', sans-serif",
+    },
+    header: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        maxWidth: '600px',
+        margin: '0 auto 30px auto',
+    },
+    title: {
+        fontSize: '24px',
+        fontWeight: 'bold',
+        color: '#0f172a',
+    },
+    backLink: {
+        color: '#64748b',
+        textDecoration: 'none',
+        fontSize: '14px',
+    },
+    main: {
+        maxWidth: '600px',
+        margin: '0 auto',
+    },
+    form: {
+        background: '#fff',
+        padding: '30px',
+        borderRadius: '16px',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+    },
+    formGroup: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+    },
+    label: {
+        fontSize: '14px',
+        fontWeight: '600',
+        color: '#334155',
+    },
+    input: {
+        padding: '12px',
+        borderRadius: '10px',
+        border: '1px solid #e2e8f0',
+        fontSize: '14px',
+        outline: 'none',
+    },
+    textarea: {
+        padding: '12px',
+        borderRadius: '10px',
+        border: '1px solid #e2e8f0',
+        fontSize: '14px',
+        outline: 'none',
+        minHeight: '120px',
+        fontFamily: 'inherit',
+    },
+    checkboxGroup: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+    },
+    checkboxLabel: {
+        fontSize: '14px',
+        color: '#64748b',
+    },
+    submitButton: {
+        background: '#0f172a',
+        color: '#fff',
+        padding: '14px',
+        borderRadius: '10px',
+        border: 'none',
+        fontWeight: 'bold',
+        fontSize: '16px',
+        cursor: 'pointer',
+        marginTop: '10px',
+    },
+    error: {
+        fontSize: '12px',
+        color: '#ef4444',
+    },
 };

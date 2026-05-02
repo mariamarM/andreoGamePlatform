@@ -5,6 +5,7 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\GameSessionController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\StaffMessageController;
+use App\Http\Controllers\UserController;
 use App\Models\Game;
 use App\Models\User;
 use App\Services\FacialRecognitionService;
@@ -163,13 +164,27 @@ Route::get('/', function (Request $request) {
     return Inertia::render('Home', [
         'user' => $request->user(),
         'canRegister' => Features::enabled(Features::registration()),
+        'games' => Game::where('is_published', true)->get(),
     ]);
 })->name('Home');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin', fn (Request $request) => Inertia::render('admin/AdminDashboard', [
-        'user' => $request->user(),
-    ]))->name('admin');
+    Route::get('/admin', function (Request $request) {
+        return Inertia::render('admin/AdminDashboard', [
+            'user' => $request->user(),
+            'recentUsers' => \App\Models\User::latest()->take(5)->get(),
+            'recentGames' => \App\Models\Game::latest()->take(5)->get(),
+        ]);
+    })->name('admin');
+
+    // Gestión de Usuarios
+    Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');
+    Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
+    Route::put('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
+    Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+
+    // Gestión de Juegos (Admin)
+    Route::get('/admin/games', [GameController::class, 'adminIndex'])->name('admin.games');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -194,22 +209,19 @@ Route::middleware(['auth', 'role:admin,gestor'])->group(function () {
     Route::post('/staff-chat/messages', [StaffMessageController::class, 'store'])->name('staff.chat.store');
 });
 
-Route::middleware(['auth', 'role:gestor'])->group(function () {
-    Route::get('/gestor', fn (Request $request) => Inertia::render('gestor/Index', [
-        'user' => $request->user(),
-    ]))->name('gestor');
+Route::middleware(['auth', 'role:admin,gestor'])->group(function () {
+    Route::get('/gestor', function (Request $request) {
+        return Inertia::render('gestor/Dashboard', [
+            'user' => $request->user(),
+        ]);
+    })->name('gestor.index');
     
-    Route::get('/gestor/games', fn (Request $request) => Inertia::render('gestor/Show', [
-        'user' => $request->user(),
-    ]))->name('gestor.games');
-    
-    Route::get('/gestor/games/create', fn (Request $request) => Inertia::render('gestor/Create', [
-        'user' => $request->user(),
-    ]))->name('gestor.games.create');
-    
-    Route::get('/gestor/games/{id}/edit', fn (Request $request) => Inertia::render('gestor/Edit', [
-        'user' => $request->user(),
-    ])->name('gestor.games.edit'));
+    Route::get('/gestor/games', [GameController::class, 'gestorIndex'])->name('gestor.games');
+    Route::get('/gestor/games/create', fn () => Inertia::render('gestor/Create'))->name('gestor.games.create');
+    Route::post('/gestor/games', [GameController::class, 'store'])->name('gestor.games.store');
+    Route::get('/gestor/games/{id}/edit', [GameController::class, 'edit'])->name('gestor.games.edit');
+    Route::put('/gestor/games/{id}', [GameController::class, 'update'])->name('gestor.games.update');
+    Route::delete('/gestor/games/{id}', [GameController::class, 'destroy'])->name('gestor.games.destroy');
 });
 
 Route::get('/games', fn () => Inertia::render('Games', [

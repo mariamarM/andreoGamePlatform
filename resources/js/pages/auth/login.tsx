@@ -96,7 +96,7 @@ export default function Login({
                     'X-CSRF-TOKEN': csrfToken,
                     'Accept': 'application/json',
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email, password, _token: csrfToken }),
             });
 
             const data = await response.json();
@@ -170,6 +170,7 @@ export default function Login({
             const formData = new FormData();
             formData.append('email', email);
             formData.append('password', password);
+            formData.append('_token', csrfToken);
             formData.append('foto_webcam', new File([blob], 'webcam.jpg', { type: 'image/jpeg' }));
 
             const response = await fetch('/facial-verify', {
