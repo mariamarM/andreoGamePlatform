@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import GameChat from '@/components/MisComponentes/GameChat';
 import { Head, Link } from '@inertiajs/react';
+import * as faceapi from 'face-api.js';
 
 interface GameViewProps {
     game: {
@@ -36,8 +37,8 @@ export default function GameView({ game, user, ranking, userBestScore, messages 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
 
-    // Definir la sala privada del usuario
-    const userRoom = `user_${user.id}`;
+    // Definir la sala global para el juego (solo para usuarios)
+    const userRoom = 'global_game';
 
     useEffect(() => {
         const checkScore = () => {
@@ -77,64 +78,120 @@ export default function GameView({ game, user, ranking, userBestScore, messages 
         }
     };
 
+    const [isModelsLoaded, setIsModelsLoaded] = useState(false);
+
+    // Cargar modelos de face-api.js
     useEffect(() => {
-        const startEmotionDetection = async () => {
+        const loadModels = async () => {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const MODEL_URL = '/models';
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL);
+                setIsModelsLoaded(true);
+            } catch (err) {
+                console.error('Error loading face-api models:', err);
+            }
+        };
+        loadModels();
+    }, []);
+
+    const onEmotionDetected = useCallback(async (detectedEmotion: string, detectedConfidence: number) => {
+        setEmotion(detectedEmotion);
+        setConfidence(detectedConfidence);
+        setFaceFound(true);
+
+        try {
+            // @ts-ignore
+            await window.axios.post('/api/game/emotion', {
+                emotion: detectedEmotion,
+                confidence: detectedConfidence,
+                game_id: game.id,
+                detected_at: new Date().toISOString(),
+            });
+        } catch (error) {
+            console.error('Error sending emotion data:', error);
+        }
+    }, [game.id]);
+
+    useEffect(() => {
+        let intervalId: any;
+        let stream: MediaStream | null = null;
+        let animationFrameId: number;
+
+        const startCamera = async () => {
+            console.log("Starting camera...");
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: 640, height: 480 } 
+                });
                 streamRef.current = stream;
+                
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
-                }
-                setIsDetecting(true);
-                
-                // Bucle de dibujo a 60fps
-                const drawLoop = () => {
-                    if (canvasRef.current && videoRef.current && streamRef.current?.active) {
-                        const ctx = canvasRef.current.getContext('2d');
-                        if (ctx) {
-                            ctx.save();
-                            ctx.scale(-1, 1);
-                            ctx.drawImage(videoRef.current, -canvasRef.current.width, 0, canvasRef.current.width, canvasRef.current.height);
-                            ctx.restore();
-                        }
-                        requestAnimationFrame(drawLoop);
-                    }
-                };
-                requestAnimationFrame(drawLoop);
-
-                const detectEmotion = async () => {
-                    setFaceFound(Math.random() > 0.1); 
-                    const emotions = ['happy', 'sad', 'angry', 'surprised', 'neutral', 'fearful', 'disgusted'];
-                    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-                    const randomConfidence = Math.random() * 0.4 + 0.6;
-                    setEmotion(randomEmotion);
-                    setConfidence(randomConfidence);
-
-                    try {
-                        const token = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement).content;
-                        await fetch('/api/game/emotion', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
-                            body: JSON.stringify({
-                                emotion: randomEmotion,
-                                confidence: randomConfidence,
-                                game_id: game.id,
-                                detected_at: new Date().toISOString(),
-                            }),
-                        });
-                    } catch (error) { console.error('Error sending emotion data:', error); }
+                    console.log("Stream assigned to video element");
                     
-                    if (streamRef.current?.active) setTimeout(detectEmotion, 5000);
-                };
-                detectEmotion();
+                    videoRef.current.onloadedmetadata = () => {
+                        console.log("Video metadata loaded, starting draw loop");
+                        setIsDetecting(true);
+                        
+                        const drawLoop = () => {
+                            if (canvasRef.current && videoRef.current && stream?.active) {
+                                const ctx = canvasRef.current.getContext('2d');
+                                if (ctx) {
+                                    ctx.save();
+                                    ctx.scale(-1, 1);
+                                    ctx.drawImage(videoRef.current, -canvasRef.current.width, 0, canvasRef.current.width, canvasRef.current.height);
+                                    ctx.restore();
+                                }
+                                animationFrameId = requestAnimationFrame(drawLoop);
+                            }
+                        };
+                        drawLoop();
+                    };
+                }
+
+                // Detección de emociones (solo si los modelos están listos)
+                if (isModelsLoaded) {
+                    console.log("Models ready, starting detection interval");
+                    intervalId = setInterval(async () => {
+                        if (!videoRef.current) return;
+                        
+                        try {
+                            const detections = await faceapi.detectSingleFace(
+                                videoRef.current,
+                                new faceapi.TinyFaceDetectorOptions()
+                            ).withFaceExpressions();
+
+                            if (detections && detections.expressions) {
+                                const expressions = detections.expressions as any;
+                                const dominant = Object.keys(expressions).reduce((a, b) => 
+                                    expressions[a] > expressions[b] ? a : b
+                                );
+                                onEmotionDetected(dominant, expressions[dominant]);
+                            } else {
+                                setFaceFound(false);
+                            }
+                        } catch (err) {
+                            console.error('Detection error:', err);
+                        }
+                    }, 3000);
+                }
+
             } catch (err) {
                 console.error('Error accessing camera:', err);
                 setIsDetecting(false);
             }
         };
-        startEmotionDetection();
-        return () => { if (streamRef.current) streamRef.current.getTracks().forEach(track => track.stop()); };
-    }, [game.id]);
+
+        startCamera();
+
+        return () => {
+            console.log("Cleaning up camera...");
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            if (intervalId) clearInterval(intervalId);
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        };
+    }, [game.id, isModelsLoaded, onEmotionDetected]);
 
     return (
         <div style={styles.container}>

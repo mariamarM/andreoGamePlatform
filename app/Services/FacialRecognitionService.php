@@ -39,7 +39,7 @@ class FacialRecognitionService
             $response = Http::timeout($this->timeout)
                 ->attach('img1', file_get_contents($imagePath1), 'registro.jpg')
                 ->attach('img2', file_get_contents($imagePath2), 'webcam.jpg')
-                ->post($this->serviceUrl.'/verify');
+                ->post($this->serviceUrl); // Removido /verify extra
 
             if (! $response->successful()) {
                 Log::warning('Facial service error', [

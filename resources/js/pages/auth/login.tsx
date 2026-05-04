@@ -1,4 +1,4 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, router } from '@inertiajs/react';
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 import InputError from '@/components/input-error';
@@ -85,23 +85,15 @@ export default function Login({
         setCapturedImage(null);
 
         try {
-            // Obtener token CSRF
-            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-            const csrfToken = csrfMeta?.getAttribute('content') || '';
+            // Re-evaluando: El usuario quiere un modal que se queda en la misma página.
+            // Si queremos una respuesta JSON sin recargar/redirigir, 
+            // usamos axios que ya viene configurado en Laravel con el CSRF.
+            
+            // @ts-ignore
+            const response = await window.axios.post('/facial-login', { email, password });
+            const data = response.data;
 
-            const response = await fetch('/facial-login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({ email, password, _token: csrfToken }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok || !data.success) {
+            if (!data.success) {
                 setFacialMessage(data.message || 'Credenciales incorrectas.');
                 setFacialStatus('error');
                 return;
@@ -152,9 +144,6 @@ export default function Login({
         setFacialMessage('Verificando identidad con IA...');
 
         try {
-            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-            const csrfToken = csrfMeta?.getAttribute('content') || '';
-
             // Convertir canvas a blob
             const blob = await new Promise<Blob | null>((resolve) => {
                 canvasRef.current!.toBlob(resolve, 'image/jpeg', 0.9);
@@ -163,26 +152,22 @@ export default function Login({
             if (!blob) {
                 setFacialMessage('Error al procesar la imagen.');
                 setFacialStatus('error');
-
                 return;
             }
 
             const formData = new FormData();
             formData.append('email', email);
             formData.append('password', password);
-            formData.append('_token', csrfToken);
             formData.append('foto_webcam', new File([blob], 'webcam.jpg', { type: 'image/jpeg' }));
 
-            const response = await fetch('/facial-verify', {
-                method: 'POST',
+            // @ts-ignore
+            const response = await window.axios.post('/facial-verify', formData, {
                 headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json',
-                },
-                body: formData,
+                    'Content-Type': 'multipart/form-data',
+                }
             });
 
-            const data = await response.json();
+            const data = response.data;
 
             if (data.success && data.match) {
                 setFacialStatus('success');

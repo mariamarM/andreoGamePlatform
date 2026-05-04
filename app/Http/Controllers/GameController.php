@@ -113,10 +113,14 @@ class GameController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'role_id' => $user->role_id,
             ],
             'ranking' => $ranking,
             'userBestScore' => $userBestScore,
-            'messages' => \App\Models\Message::where('room', 'user_' . $user->id)
+            'messages' => \App\Models\Message::where('room', 'global_game')
+                ->whereHas('user', function($query) {
+                    $query->where('role_id', 3); // Solo usuarios normales
+                })
                 ->with('user:id,name')
                 ->latest()
                 ->take(50)

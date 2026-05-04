@@ -5,7 +5,9 @@ interface Conversation {
     room: string;
     name: string;
     last_message_at: string | null;
+
 }
+declare const window: any;
 
 interface Message {
     id: number;
@@ -17,6 +19,7 @@ interface Message {
     };
     created_at: string;
 }
+
 
 interface Props {
     conversations: Conversation[];
@@ -81,7 +84,7 @@ export default function ChatIndex({ conversations, messages: initialMessages, ac
     return (
         <div style={styles.container}>
             <Head title="Mensajería" />
-            
+
             <div style={styles.appWrap}>
                 {/* Sidebar */}
                 <div style={styles.sidebar}>
@@ -102,7 +105,7 @@ export default function ChatIndex({ conversations, messages: initialMessages, ac
                                 <div style={styles.avatar}>{conv.name.charAt(0)}</div>
                                 <div style={styles.convInfo}>
                                     <div style={styles.convName}>{conv.name}</div>
-                                    <div style={styles.convDate}>{conv.last_message_at ? new Date(conv.last_message_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</div>
+                                    <div style={styles.convDate}>{conv.last_message_at ? new Date(conv.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</div>
                                 </div>
                             </Link>
                         ))}
@@ -121,11 +124,11 @@ export default function ChatIndex({ conversations, messages: initialMessages, ac
                                     {conversations.find(c => c.room === activeRoom)?.name || 'Conversación'}
                                 </div>
                             </div>
-                            
+
                             <div style={styles.messageArea} ref={scrollRef}>
                                 {messages.map((msg) => (
-                                    <div 
-                                        key={msg.id} 
+                                    <div
+                                        key={msg.id}
                                         style={{
                                             ...styles.messageWrap,
                                             justifyContent: msg.user_id === user.id ? 'flex-end' : 'flex-start'
@@ -139,7 +142,7 @@ export default function ChatIndex({ conversations, messages: initialMessages, ac
                                             {msg.user_id !== user.id && <div style={styles.senderName}>{msg.user.name}</div>}
                                             <div style={styles.msgText}>{msg.content}</div>
                                             <div style={styles.msgTime}>
-                                                {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                                {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </div>
                                         </div>
                                     </div>
