@@ -155,11 +155,6 @@ Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
     Route::post('/game/emotion', [GameEmotionController::class, 'store'])->name('game.emotion.store');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Páginas Principales (Inertia)
-|--------------------------------------------------------------------------
-*/
 Route::get('/', function (Request $request) {
     return Inertia::render('Home', [
         'user' => $request->user(),
@@ -183,7 +178,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
-    // Gestión de Juegos (Admin)
     Route::get('/admin/games', [GameController::class, 'adminIndex'])->name('admin.games');
 });
 
@@ -215,7 +209,7 @@ Route::middleware(['auth', 'role:admin,gestor'])->group(function () {
             'user' => $request->user(),
         ]);
     })->name('gestor.index');
-    
+
     Route::get('/gestor/games', [GameController::class, 'gestorIndex'])->name('gestor.games');
     Route::get('/gestor/games/create', fn () => Inertia::render('gestor/Create'))->name('gestor.games.create');
     Route::post('/gestor/games', [GameController::class, 'store'])->name('gestor.games.store');
